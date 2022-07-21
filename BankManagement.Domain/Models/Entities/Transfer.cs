@@ -1,8 +1,8 @@
 namespace BankManagement.Domain;
 
-public class Transference : Transaction
+public class Transfer : Transaction
 {
-  new TransactionType Type => TransactionType.Transference;
+  new TransactionType Type => TransactionType.Transfer;
   public int DestinationAccountId { get; set; }
   public Account? DestinationAccount { get; set; }
 }
