@@ -4,7 +4,7 @@ using MediatR;
 
 namespace BankManagement.Application;
 
-public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerRequestCommand, int>
+public class CreateCustomerRequestCommandHandler : IRequestHandler<CreateCustomerRequestCommand, int>
 {
   public Task<int> Handle(CreateCustomerRequestCommand request, CancellationToken cancellationToken)
   {
