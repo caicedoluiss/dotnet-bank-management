@@ -51,6 +51,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.IdNumber = string.Empty;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -65,6 +66,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.Name = string.Empty;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -82,6 +84,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.Gender = gender;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -99,6 +102,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.Gender = gender;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -119,6 +123,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.Age = age;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -135,6 +140,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.Age = age;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -154,6 +160,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.Email = email;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -171,6 +178,7 @@ public class UpdateCustomerRequestCommandHandlerTests
     newCustomerDTO.PhoneNumber = phoneNumber;
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
@@ -184,6 +192,7 @@ public class UpdateCustomerRequestCommandHandlerTests
   {
     var request = new UpdateCustomerRequestCommand
     {
+      CustomerId = customerId,
       CustomerInfo = newCustomerDTO
     };
 
