@@ -79,7 +79,7 @@ public class UpdateCustomerRequestCommandHandlerTests
   [InlineData("")]
   [InlineData("NonExistentValue")]
   [InlineData("-1")]
-  public void Handle_InvalidCustomerGender_ThrowsArgumentException(string gender)
+  public void Handle_InvalidCustomerGender_ThrowsArgumentException(string? gender)
   {
     newCustomerDTO.Gender = gender;
     var request = new UpdateCustomerRequestCommand
@@ -95,9 +95,15 @@ public class UpdateCustomerRequestCommandHandlerTests
 
   [Theory]
   [InlineData(null)]
+  [InlineData("None")]
+  [InlineData("Female")]
   [InlineData("Male")]
+  [InlineData("Other")]
   [InlineData("0")]
-  public async Task Handle_ValidCustomerGender_ReturnsValidExistentCustomerDTO(string gender)
+  [InlineData("1")]
+  [InlineData("2")]
+  [InlineData("3")]
+  public async Task Handle_ValidCustomerGender_ReturnsValidExistentCustomerDTO(string? gender)
   {
     newCustomerDTO.Gender = gender;
     var request = new UpdateCustomerRequestCommand
