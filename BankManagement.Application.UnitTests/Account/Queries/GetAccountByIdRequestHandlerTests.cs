@@ -62,7 +62,7 @@ public class GetAccountByIdRequestHandlerTests
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetCustomerInfo_ReturnsExistentAccountDTOWithCustomerInfo()
+  public async Task Handle_ExistentIdGetCustomerInfoTrue_ReturnsExistentAccountDTOWithCustomerInfo()
   {
     var request = new GetAccountByIdRequest
     {
@@ -79,12 +79,12 @@ public class GetAccountByIdRequestHandlerTests
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetCustomerInfoFalse_ReturnsExistentAccountDTOWithCustomerInfo()
+  public async Task Handle_ExistentIdGetCustomerInfoFalse_ReturnsExistentAccountDTOWithNoCustomerInfo()
   {
     var request = new GetAccountByIdRequest
     {
       AccountId = 1,
-      RetreiveCustomerInfo = true
+      RetreiveCustomerInfo = false
     };
 
     var result = await handler.Handle(request, default);
