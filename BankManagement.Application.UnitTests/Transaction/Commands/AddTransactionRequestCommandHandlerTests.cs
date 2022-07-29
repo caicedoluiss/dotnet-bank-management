@@ -9,8 +9,8 @@ public class AddTransactionRequestCommandHandlerTests
 {
   private readonly AddTransactionRequestCommandHandler handler;
 
-  private AddTransactionRequestCommand request;
-  private UpdatingTransactionDTO transactionDTO;
+  private readonly AddTransactionRequestCommand request;
+  private readonly UpdatingTransactionDTO transactionDTO;
 
   public AddTransactionRequestCommandHandlerTests()
   {
@@ -31,19 +31,11 @@ public class AddTransactionRequestCommandHandlerTests
     };
   }
 
+
   [Fact]
-  public void Handle_InvalidNullTransactionInfo_ThrowsArgumentException()
+  public void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
   {
     request.TransctionInfo = null;
-    Action action = () => handler.Handle(request, default);
-
-    Assert.Throws<ArgumentException>(action);
-  }
-
-  [Fact]
-  public void Handle_InvalidEmptyDate_ThrowsArgumentException()
-  {
-    transactionDTO.Date = string.Empty;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -52,16 +44,16 @@ public class AddTransactionRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidTransactionAccountIdLessThan1_ThrowsArgumentException(int customerId)
+  public void Handle_TransactionAccountIdLessThan1_ThrowsArgumentException(int id)
   {
-    transactionDTO.AccountId = customerId;
+    transactionDTO.AccountId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_InvalidTransactionAccountIdNonExistentId_ReturnsNull()
+  public async Task Handle_TransactionAccountIdNonExistent_ThrowsArgumentException()
   {
     transactionDTO.AccountId = int.MaxValue;
     var result = await handler.Handle(request, default);
@@ -72,8 +64,9 @@ public class AddTransactionRequestCommandHandlerTests
   [Theory]
   [InlineData(null)]
   [InlineData("")]
-  [InlineData("fsdf42")]
-  public void Handle_InvalidDate_ThrowsArgumentException(string? date)
+  [InlineData("qwerty")]
+  [InlineData("07-28-2022")]
+  public void Handle_TransactionDateInvalid_ThrowsArgumentException(string? date)
   {
     transactionDTO.Date = date;
     Action action = () => handler.Handle(request, default);
@@ -84,7 +77,7 @@ public class AddTransactionRequestCommandHandlerTests
   //TODO: Setup AddTransaction valid date test case with formatted date.
   [Theory]
   [InlineData(null)]
-  public async Task Handle_ValidDate_ReturnsValidId(string? date)
+  public async Task Handle_TransactionDateValid_ReturnsValidId(string? date)
   {
     transactionDTO.Date = date;
     var result = await handler.Handle(request, default);
@@ -100,7 +93,7 @@ public class AddTransactionRequestCommandHandlerTests
   [InlineData(1000)]
   [InlineData(55.09)]
   [InlineData(-895.14)]
-  public async Task Handle_ValidValue_ReturnsValidId(decimal value)
+  public async Task Handle_TransactionValueValid_ReturnsValidId(decimal value)
   {
     transactionDTO.Value = value;
     int result = await handler.Handle(request, default);

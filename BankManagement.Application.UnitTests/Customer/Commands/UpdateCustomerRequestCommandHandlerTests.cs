@@ -10,15 +10,15 @@ public class UpdateCustomerRequestCommandHandlerTests
 {
   private readonly UpdateCustomerRequestCommandHandler handler;
 
-  private int customerId;
-  private NewCustomerDTO newCustomerDTO;
+  private readonly UpdateCustomerRequestCommand request;
+  private readonly NewCustomerDTO newCustomerDTO;
 
   public UpdateCustomerRequestCommandHandlerTests()
   {
     var serviceProvider = TestsConfiguration.ServiceProvider;
+
     handler = serviceProvider.GetRequiredService<UpdateCustomerRequestCommandHandler>();
 
-    customerId = 1;
     newCustomerDTO = new()
     {
       IdNumber = "123456",
@@ -29,32 +29,57 @@ public class UpdateCustomerRequestCommandHandlerTests
       PhoneNumber = "+57 1234567890",
       State = true
     };
+
+    request = new()
+    {
+      CustomerId = 1,
+      CustomerInfo = newCustomerDTO
+    };
   }
 
   [Fact]
-  public void Handle_InvalidNullCustomerInfo_ThrowsArgumentException()
+  public void Handle_RequestNullCustomerInfo_ThrowsArgumentException()
   {
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = null
-    };
+    request.CustomerInfo = null;
+    Action action = () => handler.Handle(request, default);
 
+    Assert.Throws<ArgumentException>(action);
+  }
+
+  [Theory]
+  [InlineData(-1)]
+  [InlineData(0)]
+  public void Handle_RequestCustomerIdLessThan1_ThrowsArgumentException(int id)
+  {
+    request.CustomerId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_InvalidEmptyCustomerIdNumber_ThrowsArgumentException()
+  public void Handle_RequestCustomerIdNonExistent_ThrowsArgumentException()
+  {
+    request.CustomerId = int.MaxValue;
+    Action action = () => handler.Handle(request, default);
+
+    Assert.Throws<ArgumentException>(action);
+  }
+
+  [Fact]
+  public async Task Handle_RequestCustomerIdExistent_ReturnsValidId()
+  {
+    var result = await handler.Handle(request, default);
+
+    Assert.NotNull(result);
+    Assert.IsType<ExistentCustomerDTO>(result);
+    Assert.True(result.Id > 0);
+  }
+
+  [Fact]
+  public void Handle_CustomerIdNumberEmpty_ThrowsArgumentException()
   {
     newCustomerDTO.IdNumber = string.Empty;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -64,12 +89,6 @@ public class UpdateCustomerRequestCommandHandlerTests
   public void Handle_InvalidEmptyCustomerName_ThrowsArgumentException()
   {
     newCustomerDTO.Name = string.Empty;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -79,15 +98,9 @@ public class UpdateCustomerRequestCommandHandlerTests
   [InlineData("")]
   [InlineData("NonExistentValue")]
   [InlineData("-1")]
-  public void Handle_InvalidCustomerGender_ThrowsArgumentException(string? gender)
+  public void Handle_CustomerGenderInvalid_ThrowsArgumentException(string? gender)
   {
     newCustomerDTO.Gender = gender;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -103,15 +116,9 @@ public class UpdateCustomerRequestCommandHandlerTests
   [InlineData("1")]
   [InlineData("2")]
   [InlineData("3")]
-  public async Task Handle_ValidCustomerGender_ReturnsValidExistentCustomerDTO(string? gender)
+  public async Task Handle_CustomerGenderValid_ReturnsValidExistentCustomerDTO(string? gender)
   {
     newCustomerDTO.Gender = gender;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -124,15 +131,9 @@ public class UpdateCustomerRequestCommandHandlerTests
   [InlineData(-1)]
   [InlineData(0)]
   [InlineData(17)]
-  public void Handle_InvalidCustomerAgeLessThan18_ThrowsArgumentException(int age)
+  public void Handle_CustomerAgeLessThan18_ThrowsArgumentException(int age)
   {
     newCustomerDTO.Age = age;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -141,15 +142,9 @@ public class UpdateCustomerRequestCommandHandlerTests
   [Theory]
   [InlineData(18)]
   [InlineData(50)]
-  public async Task Handle_ValidCustomerAgeGreaterEqualsThan18_ReturnsValidId(int age)
+  public async Task Handle_CustomerAgeGreaterEqualsThan18_ReturnsValidId(int age)
   {
     newCustomerDTO.Age = age;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -159,83 +154,51 @@ public class UpdateCustomerRequestCommandHandlerTests
 
   [Theory]
   [InlineData("")]
-  [InlineData("asdass")]
+  [InlineData("qwerty")]
   [InlineData("jdoe@em")]
-  public void Handle_InvalidCustomerEmail_ThrowsArgumentException(string email)
+  public void Handle_CustomerEmailInvalid_ThrowsArgumentException(string email)
   {
     newCustomerDTO.Email = email;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
+  }
+
+  [Theory]
+  [InlineData("jdoe@email.com")]
+  [InlineData("jdoe2@anotheremail.com.co")]
+  public async Task Handle_CustomerEmailValid_ReturnsExistentCustomerDTO(string email)
+  {
+    newCustomerDTO.Email = email;
+    var result = await handler.Handle(request, default);
+
+    Assert.NotNull(result);
+    Assert.IsType<ExistentCustomerDTO>(result);
+    Assert.True(result.Id > 0);
   }
 
   [Theory]
   [InlineData("")]
   [InlineData("65665")]
   [InlineData("+1 123456798")]
-  public void Handle_InvalidCustomerPhoneNumber_ThrowsArgumentException(string phoneNumber)
+  public void Handle_CustomerPhoneNumberInvalid_ThrowsArgumentException(string phoneNumber)
   {
     newCustomerDTO.PhoneNumber = phoneNumber;
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
-  [Fact]
-  public async Task Handle_ValidRequestExistentCustomerId_ReturnsValidId()
+  [Theory]
+  [InlineData("+57 1234567890")]
+  [InlineData("+1 0987654321")]
+  public async Task Handle_CustomerPhoneNumberValid_ReturnsExistentCustomerDTO(string phoneNumber)
   {
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
+    newCustomerDTO.PhoneNumber = phoneNumber;
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentCustomerDTO>(result);
     Assert.True(result.Id > 0);
-  }
-
-  [Theory]
-  [InlineData(-1)]
-  [InlineData(0)]
-  public void Handle_InvalidCustomerId_ThrowsArgumentException(int customerId)
-  {
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = customerId,
-      CustomerInfo = newCustomerDTO
-    };
-
-    Action action = () => handler.Handle(request, default);
-
-    Assert.Throws<ArgumentException>(action);
-  }
-
-  [Fact]
-  public void Handle_InvalidCustomerIdNonExistent_ThrowsArgumentException()
-  {
-    var request = new UpdateCustomerRequestCommand
-    {
-      CustomerId = int.MaxValue,
-      CustomerInfo = newCustomerDTO
-    };
-
-    Action action = () => handler.Handle(request, default);
-
-    Assert.Throws<ArgumentException>(action);
   }
 }

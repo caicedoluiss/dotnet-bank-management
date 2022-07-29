@@ -9,7 +9,7 @@ public class DeleteAccountRequestCommandHandlerTests
 {
   private readonly DeleteAccountRequestCommandHandler handler;
 
-  private DeleteAccountRequestCommand request;
+  private readonly DeleteAccountRequestCommand request;
 
   public DeleteAccountRequestCommandHandlerTests()
   {
@@ -25,47 +25,49 @@ public class DeleteAccountRequestCommandHandlerTests
   }
 
   [Theory]
-  [InlineData(-2)]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_IdLessThan1_ThrowsArgumentExcetion(int accountId)
+  public void Handle_RequestAccountIdLessThan1_ThrowsArgumentException(int id)
   {
-    request.AccountId = accountId;
-
+    request.AccountId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_NonExistentId_ThrowsArgumentExcetion()
+  public void Handle_RequestAccountIdNonExistent_ThrowsArgumentException()
   {
     request.AccountId = int.MaxValue;
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetCustomerInfoFalse_ReturnsExistentCustomerDTO()
+  public async Task Handle_RequestGetCustomerInfoTrue_ReturnsExistentAccountDTOWithCustomerInfo()
   {
-    var result = await handler.Handle(request, default);
+    request.RetrieveCustomerInfo = true;
 
-    Assert.NotNull(result);
-    Assert.IsType<ExistentAccountDTO>(result);
-    Assert.Equal(request.AccountId, result.Id);
-    Assert.Null(result.Customer);
-  }
-
-  [Fact]
-  public async Task Handle_ExistentIdGetCustomerInfoTrue_ReturnsExistentCustomerDTO()
-  {
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentAccountDTO>(result);
     Assert.Equal(request.AccountId, result.Id);
     Assert.NotNull(result.Customer);
+    Assert.IsType<ExistentCustomerDTO>(result.Customer);
+  }
+
+  [Fact]
+  public async Task Handle_RequestGetCustomerInfoFalse_ReturnsExistentAccountDTOWithCustomerInfo()
+  {
+    request.RetrieveCustomerInfo = false;
+
+    var result = await handler.Handle(request, default);
+
+    Assert.NotNull(result);
+    Assert.IsType<ExistentAccountDTO>(result);
+    Assert.Equal(request.AccountId, result.Id);
+    Assert.Null(result.Customer);
   }
 }

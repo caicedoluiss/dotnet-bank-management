@@ -9,8 +9,8 @@ public class UpdateTransactionRequestCommandHandlerTests
 {
   private readonly UpdateTransactionRequestCommandHandler handler;
 
-  private UpdateTransactionRequestCommand request;
-  private UpdatingTransactionDTO transactionDTO;
+  private readonly UpdateTransactionRequestCommand request;
+  private readonly UpdatingTransactionDTO transactionDTO;
 
   public UpdateTransactionRequestCommandHandlerTests()
   {
@@ -34,8 +34,9 @@ public class UpdateTransactionRequestCommandHandlerTests
     };
   }
 
+
   [Fact]
-  public void Handle_InvalidNullTransactionInfo_ThrowsArgumentException()
+  public void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
   {
     request.TransanctionInfo = null;
     Action action = () => handler.Handle(request, default);
@@ -46,68 +47,62 @@ public class UpdateTransactionRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidTransactionIdLessThan1_ThrowsArgumentException(int transactionId)
+  public void Handle_RequestTransactionIdLessThan1_ThrowsArgumentException(int id)
   {
-    request.TransactionId = transactionId;
+    request.TransactionId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_InvalidTransactionIdNonExistentId_ReturnsNull()
+  public void Handle_RequestTransactionIdNonExistent_ThrowsArgumentException()
   {
     request.TransactionId = int.MaxValue;
-    var result = await handler.Handle(request, default);
+    Action action = () => handler.Handle(request, default);
 
-    Assert.Null(result);
+    Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_InvalidTransactionIdExistentId_ReturnsExstentTransactionDTO()
+  public async Task Handle_RequestTransactionIdExistent_ReturnsExistentTransactionDTO()
   {
-    request.TransactionId = 1;
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
     Assert.True(result.Id > 0);
-  }
-
-  [Fact]
-  public void Handle_InvalidEmptyDate_ThrowsArgumentException()
-  {
-    transactionDTO.Date = string.Empty;
-    Action action = () => handler.Handle(request, default);
-
-    Assert.Throws<ArgumentException>(action);
+    Assert.Equal(request.TransactionId, result.Id);
+    Assert.Null(result.Account);
+    Assert.True(result.AccountId > 0);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidTransactionAccountIdLessThan1_ThrowsArgumentException(int customerId)
+  public void Handle_TransactionAccountIdLessThan1_ThrowsArgumentException(int id)
   {
-    transactionDTO.AccountId = customerId;
+    transactionDTO.AccountId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_InvalidTransactionAccountIdNonExistentId_ReturnsNull()
+  public void Handle_TransactionAccountIdNonExistent_ThrowsArgumentException()
   {
     transactionDTO.AccountId = int.MaxValue;
-    var result = await handler.Handle(request, default);
+    Action action = () => handler.Handle(request, default);
 
-    Assert.Null(result);
+    Assert.Throws<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(null)]
   [InlineData("")]
-  [InlineData("fsdf42")]
-  public void Handle_InvalidDate_ThrowsArgumentException(string? date)
+  [InlineData("qwerty")]
+  [InlineData("07-28-2022")]
+  public void Handle_TransactionDateInvalid_ThrowsArgumentException(string? date)
   {
     transactionDTO.Date = date;
     Action action = () => handler.Handle(request, default);
@@ -118,7 +113,7 @@ public class UpdateTransactionRequestCommandHandlerTests
   //TODO: Setup AddTransaction valid date test case with formatted date.
   [Theory]
   [InlineData(null)]
-  public async Task Handle_ValidDate_ReturnsExistentTransactionDTO(string? date)
+  public async Task Handle_TransactionDateValid_ReturnsExistentTransactionDTO(string? date)
   {
     transactionDTO.Date = date;
     var result = await handler.Handle(request, default);
@@ -134,7 +129,7 @@ public class UpdateTransactionRequestCommandHandlerTests
   [InlineData(1000)]
   [InlineData(55.09)]
   [InlineData(-895.14)]
-  public async Task Handle_ValidValue_ReturnsExistentTransactionDTO(decimal value)
+  public async Task Handle_TransactionValueValid_ReturnsExistentTransactionDTO(decimal value)
   {
     transactionDTO.Value = value;
     var result = await handler.Handle(request, default);
@@ -145,23 +140,22 @@ public class UpdateTransactionRequestCommandHandlerTests
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetAccountInfoTrue_ReturnsExistentTransactionDTOWithAccountInfo()
+  public async Task Handle_RequestGetAccountInfoTrue_ReturnsExistentTransactionDTOWithAccountInfo()
   {
     request.RetrieveAccountInfo = true;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
     Assert.Equal(request.TransactionId, result.Id);
     Assert.NotNull(result.Account);
+    Assert.IsType<ExistentAccountDTO>(result.Account);
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetAccountInfoFalse_ReturnsExistentTransactionDTOWithNoAccountInfo()
+  public async Task Handle_RequestGetAccountInfoFalse_ReturnsExistentTransactionDTOWithNoAccountInfo()
   {
     request.RetrieveAccountInfo = false;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -171,31 +165,32 @@ public class UpdateTransactionRequestCommandHandlerTests
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetCustomerTrue_ReturnsExistentTransactionDTOWithAccountAndCustomerInfo()
+  public async Task Handle_RequestGetCustomerInfoTrue_ReturnsExistentTransactionDTOWithAccountAndCustomerInfo()
   {
     request.RetrieveCustomerInfo = true;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
     Assert.Equal(request.TransactionId, result.Id);
     Assert.NotNull(result.Account);
+    Assert.IsType<ExistentAccountDTO>(result.Account);
     Assert.NotNull(result.Account?.Customer);
+    Assert.IsType<ExistentCustomerDTO>(result.Account?.Customer);
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetCustomerInfoFalseGetAccountInfoTrue_ReturnsExistentTransactionDTOWithNoCustomerInfo()
+  public async Task Handle_RequestGetCustomerInfoFalseGetAccountInfoTrue_ReturnsExistentTransactionDTOWithAccountInfoAndNoCustomerInfo()
   {
     request.RetrieveAccountInfo = true;
     request.RetrieveCustomerInfo = false;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
     Assert.Equal(request.TransactionId, result.Id);
     Assert.NotNull(result.Account);
+    Assert.IsType<ExistentAccountDTO>(result.Account);
     Assert.Null(result.Account!.Customer);
   }
 }

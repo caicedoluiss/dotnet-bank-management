@@ -9,8 +9,8 @@ public class CreateTransactionRequestCommandHandlerTests
 {
   private readonly CreateTransactionRequestCommandHandler handler;
 
-  private NewTransactionDTO newTransactionDTO;
-  private CreateTransactionRequestCommand request;
+  private readonly NewTransactionDTO newTransactionDTO;
+  private readonly CreateTransactionRequestCommand request;
 
   public CreateTransactionRequestCommandHandlerTests()
   {
@@ -29,8 +29,9 @@ public class CreateTransactionRequestCommandHandlerTests
     };
   }
 
+
   [Fact]
-  public void Handle_InvalidNullTransactionInfo_ThrowsArgumentException()
+  public void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
   {
     request.TransactionInfo = null;
     Action action = () => handler.Handle(request, default);
@@ -41,7 +42,7 @@ public class CreateTransactionRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidAccountIdLessThan1_ThrowsArgumentException(int id)
+  public void Handle_TransactionAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     newTransactionDTO.AccountId = id;
     Action action = () => handler.Handle(request, default);
@@ -49,12 +50,10 @@ public class CreateTransactionRequestCommandHandlerTests
     Assert.Throws<ArgumentException>(action);
   }
 
-  [Theory]
-  [InlineData(-1)]
-  [InlineData(0)]
-  public void Handle_ValidAccountIdLessThan1_ThrowsArgumentException(int id)
+  [Fact]
+  public void Handle_TransactionAccountIdNonExistent_ThrowsArgumentException()
   {
-    newTransactionDTO.AccountId = id;
+    newTransactionDTO.AccountId = int.MaxValue;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -66,7 +65,7 @@ public class CreateTransactionRequestCommandHandlerTests
   [InlineData(1000)]
   [InlineData(55.09)]
   [InlineData(-895.14)]
-  public async Task Handle_ValidValue_ReturnsValidId(decimal value)
+  public async Task Handle_TransactionValueValid_ReturnsValidId(decimal value)
   {
     newTransactionDTO.Value = value;
     int result = await handler.Handle(request, default);

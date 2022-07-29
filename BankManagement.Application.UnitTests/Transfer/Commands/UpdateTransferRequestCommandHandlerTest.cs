@@ -9,15 +9,15 @@ public class UpdateTransferRequestCommandHandlerTest
 {
   private readonly UpdateTransferRequestCommandHandler handler;
 
-  private UpdateTransferRequestCommand request;
-  private UpdatingTransferDTO transactionDTO;
+  private readonly UpdateTransferRequestCommand request;
+  private readonly UpdatingTransferDTO transferDTO;
 
   public UpdateTransferRequestCommandHandlerTest()
   {
     var serviceProvider = TestsConfiguration.ServiceProvider;
     handler = serviceProvider.GetRequiredService<UpdateTransferRequestCommandHandler>();
 
-    transactionDTO = new()
+    transferDTO = new()
     {
       AccountId = 1,
       Date = DateTime.UtcNow.ToLongDateString(),
@@ -29,7 +29,7 @@ public class UpdateTransferRequestCommandHandlerTest
     request = new()
     {
       TransferId = 1,
-      TransanctionInfo = transactionDTO,
+      TransanctionInfo = transferDTO,
       RetrieveAccountInfo = false,
       RetrieveCustomerInfo = false,
       RetrieveDestinationAccountInfo = false,
@@ -37,8 +37,9 @@ public class UpdateTransferRequestCommandHandlerTest
     };
   }
 
+
   [Fact]
-  public void Handle_InvalidNullTransferInfo_ThrowsArgumentException()
+  public void Handle_RequestNullTransferInfo_ThrowsArgumentException()
   {
     request.TransanctionInfo = null;
     Action action = () => handler.Handle(request, default);
@@ -49,49 +50,53 @@ public class UpdateTransferRequestCommandHandlerTest
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidRequestTransferIdLessThan1_ThrowsArgumentException(int transactionId)
+  public void Handle_RequestTransferIdLessThan1_ThrowsArgumentException(int id)
   {
-    request.TransferId = transactionId;
+    request.TransferId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_InvalidRequestTransferIdNonExistentId_ReturnsNull()
+  public void Handle_RequestTransferIdNonExistent_ThrowsArgumentException()
   {
     request.TransferId = int.MaxValue;
-    var result = await handler.Handle(request, default);
+    Action action = () => handler.Handle(request, default);
 
-    Assert.Null(result);
+    Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_InvalidTransferIdExistentId_ReturnsExstentTransferDTO()
+  public async Task Handle_RequestTransferIdExistent_ReturnsExistentTransferDTO()
   {
-    request.TransferId = 1;
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
     Assert.True(result.Id > 0);
+    Assert.Equal(request.TransferId, result.Id);
+    Assert.Null(result.Account);
+    Assert.Null(result.DestinationAccountInfo);
+    Assert.True(result.AccountId > 0);
+    Assert.True(result.DestinationAccountId > 0);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidTransferAccountIdLessThan1_ThrowsArgumentException(int customerId)
+  public void Handle_TransferAccountIdLessThan1_ThrowsArgumentException(int id)
   {
-    transactionDTO.AccountId = customerId;
+    transferDTO.AccountId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_InvalidTransferAccountIdNonExistentId_ThrowsArgumentException()
+  public void Handle_TransferAccountIdNonExistent_ThrowsArgumentException()
   {
-    transactionDTO.AccountId = int.MaxValue;
+    transferDTO.AccountId = int.MaxValue;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -100,10 +105,11 @@ public class UpdateTransferRequestCommandHandlerTest
   [Theory]
   [InlineData(null)]
   [InlineData("")]
-  [InlineData("fsdf42")]
-  public void Handle_InvalidDate_ThrowsArgumentException(string? date)
+  [InlineData("qwerty")]
+  [InlineData("07-28-2022")]
+  public void Handle_TransferDateInvalid_ThrowsArgumentException(string? date)
   {
-    transactionDTO.Date = date;
+    transferDTO.Date = date;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -112,25 +118,9 @@ public class UpdateTransferRequestCommandHandlerTest
   //TODO: Setup AddTransfer valid date test case with formatted date.
   [Theory]
   [InlineData(null)]
-  public async Task Handle_ValidDate_ReturnsExistentTransferDTO(string? date)
+  public async Task Handle_TransferDateValid_ReturnsExistentTransferDTO(string? date)
   {
-    transactionDTO.Date = date;
-    var result = await handler.Handle(request, default);
-
-    Assert.NotNull(result);
-    Assert.IsType<ExistentTransferDTO>(result);
-    Assert.True(result.Id > 0);
-  }
-
-  [Theory]
-  [InlineData(-1000)]
-  [InlineData(0)]
-  [InlineData(1000)]
-  [InlineData(55.09)]
-  [InlineData(-895.14)]
-  public async Task Handle_ValidValue_ReturnsExistentTransferDTO(decimal value)
-  {
-    transactionDTO.Value = value;
+    transferDTO.Date = date;
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -139,10 +129,33 @@ public class UpdateTransferRequestCommandHandlerTest
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetAccountInfoTrue_ReturnsExistentTransferDTOWithAccountInfo()
+  public void Handle_TransferValueEquals0_ThrowsArgumentException()
+  {
+    transferDTO.Value = 0;
+    Action action = () => handler.Handle(request, default);
+
+    Assert.Throws<ArgumentException>(action);
+  }
+
+  [Theory]
+  [InlineData(-1000)]
+  [InlineData(1000)]
+  [InlineData(55.09)]
+  [InlineData(-895.14)]
+  public async Task Handle_TransferValueValid_ReturnsExistentTransferDTO(decimal value)
+  {
+    transferDTO.Value = value;
+    var result = await handler.Handle(request, default);
+
+    Assert.NotNull(result);
+    Assert.IsType<ExistentTransferDTO>(result);
+    Assert.True(result.Id > 0);
+  }
+
+  [Fact]
+  public async Task Handle_RequestGetAccountInfoTrue_ReturnsExistentTransferDTOWithAccountInfo()
   {
     request.RetrieveAccountInfo = true;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -153,10 +166,9 @@ public class UpdateTransferRequestCommandHandlerTest
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetDestinationAccountInfoTrue_ReturnsExistentTransferDTOWithDestinationAccountInfo()
+  public async Task Handle_RequestGetDestinationAccountInfoTrue_ReturnsExistentTransferDTOWithDestinationAccountInfo()
   {
     request.RetrieveDestinationAccountInfo = true;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -164,14 +176,12 @@ public class UpdateTransferRequestCommandHandlerTest
     Assert.Equal(request.TransferId, result.Id);
     Assert.NotNull(result.DestinationAccountInfo);
     Assert.IsType<ExistentAccountDTO>(result.DestinationAccountInfo);
-    Assert.True(result.DestinationAccountId > 0);
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetAccountInfoFalse_ReturnsExistentTransferDTOWithNoAccountInfo()
+  public async Task Handle_RequestGetAccountInfoFalse_ReturnsExistentTransferDTOWithNoAccountInfo()
   {
     request.RetrieveAccountInfo = false;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -181,10 +191,9 @@ public class UpdateTransferRequestCommandHandlerTest
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetDestinationAccountInfoFalse_ReturnsExistentTransferDTOWithNoDestinationAccountInfo()
+  public async Task Handle_RequestGetDestinationAccountInfoFalse_ReturnsExistentTransferDTOWithNoDestinationAccountInfo()
   {
     request.RetrieveDestinationAccountInfo = false;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -194,10 +203,9 @@ public class UpdateTransferRequestCommandHandlerTest
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetCustomerTrue_ReturnsExistentTransferDTOWithAccountAndCustomerInfo()
+  public async Task Handle_RequestGetCustomerInfoTrue_ReturnsExistentTransferDTOWithAccountAndCustomerInfo()
   {
     request.RetrieveCustomerInfo = true;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -210,10 +218,9 @@ public class UpdateTransferRequestCommandHandlerTest
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetDestinationAccountCustomerTrue_ReturnsExistentTransferDTOWithDestinationAccountAndItsCustomerInfo()
+  public async Task Handle_RequestGetDestinationAccountCustomerInfoTrue_ReturnsExistentTransferDTOWithDestinationAccountAndItsCustomerInfo()
   {
     request.RetrieveDestinationAccountCustomerInfo = true;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -226,11 +233,10 @@ public class UpdateTransferRequestCommandHandlerTest
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetCustomerInfoFalseGetAccountInfoTrue_ReturnsExistentTransferDTOWithNoCustomerInfo()
+  public async Task Handle_RequestGetCustomerInfoFalseGetAccountInfoTrue_ReturnsExistentTransferDTOWithAccountInfoAndNoItsCustomerInfo()
   {
     request.RetrieveAccountInfo = true;
     request.RetrieveCustomerInfo = false;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -242,11 +248,10 @@ public class UpdateTransferRequestCommandHandlerTest
   }
 
   [Fact]
-  public async Task Handle_ExistentIdGetDestinationCustomerInfoFalseGetAccountInfoTrue_ReturnsExistentTransferDTOWithNoDestinationCustomerInfo()
+  public async Task Handle_RequestGetDestinationCustomerInfoFalseGetAccountInfoTrue_ReturnsExistentTransferDTOWithDestinationAccountAndNoItsCustomerInfo()
   {
     request.RetrieveDestinationAccountInfo = true;
     request.RetrieveDestinationAccountCustomerInfo = false;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -254,8 +259,7 @@ public class UpdateTransferRequestCommandHandlerTest
     Assert.Equal(request.TransferId, result.Id);
     Assert.NotNull(result.DestinationAccountInfo);
     Assert.IsType<ExistentAccountDTO>(result.DestinationAccountInfo);
-    Assert.NotNull(result.Account!.Customer);
-    Assert.IsType<ExistentCustomerDTO>(result.DestinationAccountInfo!.Customer);
+    Assert.Null(result.DestinationAccountInfo!.Customer);
   }
 }
 

@@ -8,57 +8,50 @@ namespace BankManagement.Application.UnitTests;
 public class GetCustomerByIdRequestHandlerTests
 {
   private readonly GetCustomerByIdRequestHandler handler;
+  private readonly GetCustomerByIdRequest request;
 
   public GetCustomerByIdRequestHandlerTests()
   {
     var serviceProvider = TestsConfiguration.ServiceProvider;
 
     handler = serviceProvider.GetRequiredService<GetCustomerByIdRequestHandler>();
+
+    request = new()
+    {
+      CustomerId = 1
+    };
   }
 
 
   [Theory]
-  [InlineData(-2)]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_IdLessThan1_ThrowsArgumentExcetion(int customerId)
+  public void Handle_RequestCustomerIdLessThan1_ThrowsArgumentExcetion(int id)
   {
-    var request = new GetCustomerByIdRequest
-    {
-      CustomerId = customerId
-    };
-
+    request.CustomerId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public async Task Handle_NonExistentId_ReturnsNull()
+  public async Task Handle_RequestCustomerIdNonExistent_ReturnsNull()
   {
-    var request = new GetCustomerByIdRequest
-    {
-      CustomerId = int.MaxValue
-    };
-
+    request.CustomerId = int.MaxValue;
     var result = await handler.Handle(request, default);
 
     Assert.Null(result);
   }
 
   [Fact]
-  public async Task Handle_ExistentId_ReturnsExistentCustomerDTO()
+  public async Task Handle_RequestIdExistent_ReturnsExistentCustomerDTO()
   {
-    var request = new GetCustomerByIdRequest
-    {
-      CustomerId = 1
-    };
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
     Assert.IsType<ExistentCustomerDTO>(result);
     Assert.Equal(request.CustomerId, result.Id);
+    Assert.True(result.Id > 0);
   }
 
 }

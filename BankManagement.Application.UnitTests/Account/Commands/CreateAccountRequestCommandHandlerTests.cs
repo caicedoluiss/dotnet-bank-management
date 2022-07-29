@@ -9,7 +9,8 @@ public class CreateAccountRequestCommandHandlerTests
 {
   private readonly CreateAccountRequestCommandHandler handler;
 
-  private NewAccountDTO newAccountDTO;
+  private readonly CreateAccountRequestCommand request;
+  private readonly NewAccountDTO newAccountDTO;
 
   public CreateAccountRequestCommandHandlerTests()
   {
@@ -24,30 +25,17 @@ public class CreateAccountRequestCommandHandlerTests
       Type = "Savings",
       State = true
     };
-  }
 
-  [Fact]
-  public void Handle_InvalidNullAccountInfo_ThrowsArgumentException()
-  {
-    var request = new CreateAccountRequestCommand
-    {
-      AccountInfo = null
-    };
-
-    Action action = () => handler.Handle(request, default);
-
-    Assert.Throws<ArgumentException>(action);
-  }
-
-  [Fact]
-  public void Handle_InvalidEmptyAccountNumber_ThrowsArgumentException()
-  {
-    newAccountDTO.Number = string.Empty;
-    var request = new CreateAccountRequestCommand
+    request = new()
     {
       AccountInfo = newAccountDTO
     };
+  }
 
+  [Fact]
+  public void Handle_RequestNullAccountInfo_ThrowsArgumentException()
+  {
+    request.AccountInfo = null;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -56,14 +44,27 @@ public class CreateAccountRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidCustomerIdLessThan1_ThrowsArgumentException(int customerId)
+  public void Handle_CustomerIdLessThan1_ThrowsArgumentException(int id)
   {
-    newAccountDTO.CustomerId = customerId;
-    var request = new CreateAccountRequestCommand
-    {
-      AccountInfo = newAccountDTO
-    };
+    newAccountDTO.CustomerId = id;
+    Action action = () => handler.Handle(request, default);
 
+    Assert.Throws<ArgumentException>(action);
+  }
+
+  [Fact]
+  public void Handle_CustomerIdNonExistent_ThrowsArgumentException()
+  {
+    newAccountDTO.CustomerId = int.MaxValue;
+    Action action = () => handler.Handle(request, default);
+
+    Assert.Throws<ArgumentException>(action);
+  }
+
+  [Fact]
+  public void Handle_AccountNumberEmpty_ThrowsArgumentException()
+  {
+    newAccountDTO.Number = string.Empty;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -73,14 +74,9 @@ public class CreateAccountRequestCommandHandlerTests
   [InlineData("")]
   [InlineData("NonExistentValue")]
   [InlineData("-1")]
-  public void Handle_InvalidAccountType_ThrowsArgumentException(string type)
+  public void Handle_AccountTypeInvalid_ThrowsArgumentException(string type)
   {
     newAccountDTO.Type = type;
-    var request = new CreateAccountRequestCommand
-    {
-      AccountInfo = newAccountDTO
-    };
-
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
@@ -92,18 +88,14 @@ public class CreateAccountRequestCommandHandlerTests
   [InlineData("Current")]
   [InlineData("0")]
   [InlineData("1")]
-  public async Task Handle_ValidAccountType_ReturnsValidId(string? type)
+  public async Task Handle_AccountTypeValid_ReturnsValidId(string type)
   {
     newAccountDTO.Type = type;
-    var request = new CreateAccountRequestCommand
-    {
-      AccountInfo = newAccountDTO
-    };
 
-    int result = await handler.Handle(request, default);
+    var result = await handler.Handle(request, default);
 
     Assert.IsType<int>(result);
-    Assert.NotEqual(default, result);
+    Assert.NotEqual(result, default);
     Assert.True(result > 0);
   }
 }

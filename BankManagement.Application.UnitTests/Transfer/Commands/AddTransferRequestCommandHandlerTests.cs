@@ -9,8 +9,8 @@ public class AddTransferRequestCommandHandlerTests
 {
   private readonly AddTransferRequestCommandHandler handler;
 
-  private AddTransferRequestCommand request;
-  private UpdatingTransferDTO transferDTO;
+  private readonly AddTransferRequestCommand request;
+  private readonly UpdatingTransferDTO transferDTO;
 
   public AddTransferRequestCommandHandlerTests()
   {
@@ -32,8 +32,9 @@ public class AddTransferRequestCommandHandlerTests
     };
   }
 
+
   [Fact]
-  public void Handle_InvalidNullTransferInfo_ThrowsArgumentException()
+  public void Handle_RequestNullTransferInfo_ThrowsArgumentException()
   {
     request.TrasnferInfo = null;
     Action action = () => handler.Handle(request, default);
@@ -44,16 +45,16 @@ public class AddTransferRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidTransferAccountIdLessThan1_ThrowsArgumentException(int accountId)
+  public void Handle_TransferAccountIdLessThan1_ThrowsArgumentException(int id)
   {
-    transferDTO.AccountId = accountId;
+    transferDTO.AccountId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_InvalidTransferAccountIdNonExistentId_ThrowsArgumentException()
+  public void Handle_TransferAccountIdNonExistentId_ThrowsArgumentException()
   {
     transferDTO.AccountId = int.MaxValue;
     Action action = () => handler.Handle(request, default);
@@ -64,16 +65,16 @@ public class AddTransferRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_InvalidTransferDestinationAccountIdLessThan1_ThrowsArgumentException(int destinationAccountId)
+  public void Handle_TransferDestinationAccountIdLessThan1_ThrowsArgumentException(int id)
   {
-    transferDTO.DestinationAccountId = destinationAccountId;
+    transferDTO.DestinationAccountId = id;
     Action action = () => handler.Handle(request, default);
 
     Assert.Throws<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_InvalidTransferDestinationAccountIdNonExistentId_ThrowsArgumentException()
+  public void Handle_TransferDestinationAccountIdNonExistentId_ThrowsArgumentException()
   {
     transferDTO.DestinationAccountId = int.MaxValue;
     Action action = () => handler.Handle(request, default);
@@ -84,8 +85,9 @@ public class AddTransferRequestCommandHandlerTests
   [Theory]
   [InlineData(null)]
   [InlineData("")]
-  [InlineData("fsdf42")]
-  public void Handle_InvalidDate_ThrowsArgumentException(string? date)
+  [InlineData("qwerty")]
+  [InlineData("07-28-2022")]
+  public void Handle_TransferDateInvalid_ThrowsArgumentException(string? date)
   {
     transferDTO.Date = date;
     Action action = () => handler.Handle(request, default);
@@ -96,7 +98,7 @@ public class AddTransferRequestCommandHandlerTests
   //TODO: Setup AddTransaction valid date test case with formatted date.
   [Theory]
   [InlineData(null)]
-  public async Task Handle_ValidDate_ReturnsValidId(string? date)
+  public async Task Handle_TransferDateValid_ReturnsExistentTransferDTO(string? date)
   {
     transferDTO.Date = date;
     var result = await handler.Handle(request, default);
@@ -106,13 +108,21 @@ public class AddTransferRequestCommandHandlerTests
     Assert.True(result > 0);
   }
 
+  [Fact]
+  public void Handle_TransferValueEquals0_ThrowsArgumentException()
+  {
+    transferDTO.Value = 0;
+    Action action = () => handler.Handle(request, default);
+
+    Assert.Throws<ArgumentException>(action);
+  }
+
   [Theory]
   [InlineData(-1000)]
-  [InlineData(0)]
   [InlineData(1000)]
   [InlineData(55.09)]
   [InlineData(-895.14)]
-  public async Task Handle_ValidValue_ReturnsValidId(decimal value)
+  public async Task Handle_TransferValueValueValid_ReturnsExistentTransferDTO(decimal value)
   {
     transferDTO.Value = value;
     int result = await handler.Handle(request, default);
