@@ -20,7 +20,7 @@ public class UpdateTransferRequestCommandHandlerTest
     transferDTO = new()
     {
       AccountId = 1,
-      Date = DateTime.UtcNow.ToLongDateString(),
+      Date = "2022-07-29 00:00:00.000-5:00",
       Value = -50.76M,
       Balance = 1550.67M,
       DestinationAccountId = 2
@@ -115,9 +115,10 @@ public class UpdateTransferRequestCommandHandlerTest
     Assert.Throws<ArgumentException>(action);
   }
 
-  //TODO: Setup AddTransfer valid date test case with formatted date.
   [Theory]
-  [InlineData(null)]
+  [InlineData("2021-05-15 00:00:00.000Z")]
+  [InlineData("2000-11-01 10:00:00.000+2:00")]
+  [InlineData("1998-08-25 18:00:00.000-5:00")]
   public async Task Handle_TransferDateValid_ReturnsExistentTransferDTO(string? date)
   {
     transferDTO.Date = date;
