@@ -1,10 +1,38 @@
 using System;
+using BankManagement.Domain;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace BankManagement.Application.UnitTests;
 
 public static class TestsConfiguration
 {
+  private static Customer[] Customers = new Customer[]
+  {
+    new Customer
+    {
+      Id = 1,
+      IdNumber = "1",
+      Age = 20,
+      Email = "john.doe@email.com",
+      Gender = PersonGender.Male,
+      Name = "John Doe",
+      PhoneNumber = "+1 1234567890",
+      State = true
+    },
+    new Customer
+    {
+      Id = 2,
+      IdNumber = "2",
+      Age = 36,
+      Email = "jane.doe@email.com",
+      Gender = PersonGender.Female,
+      Name = "Jane Doe",
+      PhoneNumber = "+2 1023456789",
+      State = true
+    },
+  };
+
   public static IServiceProvider ServiceProvider { get; }
 
   static TestsConfiguration()
@@ -17,8 +45,28 @@ public static class TestsConfiguration
   {
     var serviceCollection = new ServiceCollection();
 
+    serviceCollection.AddScoped<IUnitOfWork>(o => GetMockUnitOfWork());
     serviceCollection.AddScoped<GetCustomerByIdRequestHandler>();
 
+    serviceCollection.AddApplicationServices();
+
     return serviceCollection;
+  }
+
+  private static ICustomersRepo GetMockCustomersRepo()
+  {
+    var mockCustomersRepo = new Mock<ICustomersRepo>();
+    mockCustomersRepo.Setup(x => x.Get(1, It.IsAny<bool>())).ReturnsAsync(Customers[0]);
+    mockCustomersRepo.Setup(x => x.Get(2, It.IsAny<bool>())).ReturnsAsync(Customers[1]);
+
+    return mockCustomersRepo.Object;
+  }
+
+  private static IUnitOfWork GetMockUnitOfWork()
+  {
+    var mockUnitOfWork = new Mock<IUnitOfWork>();
+    mockUnitOfWork.Setup(x => x.CustomersRepo).Returns(GetMockCustomersRepo());
+
+    return mockUnitOfWork.Object;
   }
 }

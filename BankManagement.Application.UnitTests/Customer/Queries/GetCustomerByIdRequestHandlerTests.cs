@@ -29,9 +29,9 @@ public class GetCustomerByIdRequestHandlerTests
   public void Handle_RequestCustomerIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.CustomerId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
@@ -50,7 +50,7 @@ public class GetCustomerByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentCustomerDTO>(result);
-    Assert.Equal(request.CustomerId, result.Id);
+    Assert.Equal(request.CustomerId, result!.Id);
     Assert.True(result.Id > 0);
   }
 
