@@ -69,10 +69,6 @@ public class CreateCustomerRequestCommandHandlerTests
   [InlineData("Female")]
   [InlineData("Male")]
   [InlineData("Other")]
-  [InlineData("0")]
-  [InlineData("1")]
-  [InlineData("2")]
-  [InlineData("3")]
   public async Task Handle_CustomerGenderValid_ReturnsValidExistentCustomerDTO(string? gender)
   {
     newCustomerDTO.Gender = gender;
@@ -112,7 +108,6 @@ public class CreateCustomerRequestCommandHandlerTests
   [Theory]
   [InlineData("")]
   [InlineData("qwerty")]
-  [InlineData("jdoe@em")]
   public async void Handle_CustomerEmailInvalid_ThrowsArgumentException(string email)
   {
     newCustomerDTO.Email = email;
