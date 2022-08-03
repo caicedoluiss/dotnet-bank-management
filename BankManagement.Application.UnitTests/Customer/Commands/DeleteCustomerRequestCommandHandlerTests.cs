@@ -26,21 +26,21 @@ public class DeleteCustomerRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestCustomerIdLessThan1_ThrowsArgumentExcetion(int id)
+  public async void Handle_RequestCustomerIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.CustomerId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_RequestCustomerIdNonExistent_ThrowsArgumentExcetion()
+  public async void Handle_RequestCustomerIdNonExistent_ThrowsArgumentExcetion()
   {
     request.CustomerId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
