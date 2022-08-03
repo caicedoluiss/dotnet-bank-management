@@ -26,12 +26,12 @@ public class GetCustomerByIdRequestHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestCustomerIdLessThan1_ThrowsArgumentExcetion(int id)
+  public async void Handle_RequestCustomerIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.CustomerId = id;
     var action = () => handler.Handle(request, default);
 
-    Assert.ThrowsAsync<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
