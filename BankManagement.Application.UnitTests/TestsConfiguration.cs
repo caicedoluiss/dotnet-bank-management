@@ -52,6 +52,7 @@ public static class TestsConfiguration
     serviceCollection.AddScoped<IUnitOfWork>(o => GetMockUnitOfWork());
     serviceCollection.AddScoped<GetCustomerByIdRequestHandler>();
     serviceCollection.AddScoped<CreateCustomerRequestCommandHandler>();
+    serviceCollection.AddScoped<UpdateCustomerRequestCommandHandler>();
 
     serviceCollection.AddTransient<NewCustomerDTO>(o => new()
     {
