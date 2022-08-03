@@ -7,7 +7,7 @@ namespace BankManagement.Application.UnitTests;
 
 public static class TestsConfiguration
 {
-  private static Customer[] Customers = new Customer[]
+  internal static Customer[] Customers = new Customer[]
   {
     new Customer
     {
@@ -18,7 +18,9 @@ public static class TestsConfiguration
       Gender = PersonGender.Male,
       Name = "John Doe",
       PhoneNumber = "+1 1234567890",
-      State = true
+      State = true,
+      CreatedAt = DateTime.UtcNow,
+      UpdatedAt = DateTime.UtcNow
     },
     new Customer
     {
@@ -33,7 +35,7 @@ public static class TestsConfiguration
     },
   };
 
-  public static IServiceProvider ServiceProvider { get; }
+  internal static IServiceProvider ServiceProvider { get; }
 
   static TestsConfiguration()
   {
@@ -45,10 +47,23 @@ public static class TestsConfiguration
   {
     var serviceCollection = new ServiceCollection();
 
+    serviceCollection.AddApplicationServices();
+
     serviceCollection.AddScoped<IUnitOfWork>(o => GetMockUnitOfWork());
     serviceCollection.AddScoped<GetCustomerByIdRequestHandler>();
+    serviceCollection.AddScoped<CreateCustomerRequestCommandHandler>();
 
-    serviceCollection.AddApplicationServices();
+    serviceCollection.AddTransient<NewCustomerDTO>(o => new()
+    {
+      IdNumber = "1",
+      Age = 20,
+      Email = "john.doe@email.com",
+      Gender = "Male",
+      Name = "John Doe",
+      PhoneNumber = "+1 1234567890",
+      State = true,
+    });
+
 
     return serviceCollection;
   }
@@ -58,6 +73,8 @@ public static class TestsConfiguration
     var mockCustomersRepo = new Mock<ICustomersRepo>();
     mockCustomersRepo.Setup(x => x.Get(1, It.IsAny<bool>())).ReturnsAsync(Customers[0]);
     mockCustomersRepo.Setup(x => x.Get(2, It.IsAny<bool>())).ReturnsAsync(Customers[1]);
+
+    mockCustomersRepo.Setup(x => x.Add(It.IsAny<Customer>())).Returns(Customers[0]);
 
     return mockCustomersRepo.Object;
   }

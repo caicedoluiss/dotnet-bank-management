@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using BankManagement.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -16,19 +15,9 @@ public class CreateCustomerRequestCommandHandlerTests
   public CreateCustomerRequestCommandHandlerTests()
   {
     var serviceProvider = TestsConfiguration.ServiceProvider;
+
     handler = serviceProvider.GetRequiredService<CreateCustomerRequestCommandHandler>();
-
-    newCustomerDTO = new()
-    {
-      IdNumber = "123456",
-      Name = "John Doe",
-      Gender = "Male",
-      Age = 20,
-      Email = "jdoe@email.com",
-      PhoneNumber = "+57 1234567890",
-      State = true
-    };
-
+    newCustomerDTO = serviceProvider.GetRequiredService<NewCustomerDTO>();
     request = new()
     {
       CustomerInfo = newCustomerDTO
@@ -36,42 +25,42 @@ public class CreateCustomerRequestCommandHandlerTests
   }
 
   [Fact]
-  public void Handle_RequestNullCustomerInfo_ThrowsArgumentException()
+  public async void Handle_RequestNullCustomerInfo_ThrowsArgumentException()
   {
     request.CustomerInfo = null;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_CustomerIdNumberEmpty_ThrowsArgumentException()
+  public async void Handle_CustomerIdNumberEmpty_ThrowsArgumentException()
   {
     newCustomerDTO.IdNumber = string.Empty;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_InvalidEmptyCustomerName_ThrowsArgumentException()
+  public async void Handle_InvalidEmptyCustomerName_ThrowsArgumentException()
   {
     newCustomerDTO.Name = string.Empty;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData("")]
   [InlineData("NonExistentValue")]
   [InlineData("-1")]
-  public void Handle_CustomerGenderInvalid_ThrowsArgumentException(string? gender)
+  public async void Handle_CustomerGenderInvalid_ThrowsArgumentException(string? gender)
   {
     newCustomerDTO.Gender = gender;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
@@ -99,12 +88,12 @@ public class CreateCustomerRequestCommandHandlerTests
   [InlineData(-1)]
   [InlineData(0)]
   [InlineData(17)]
-  public void Handle_CustomerAgeLessThan18_ThrowsArgumentException(int age)
+  public async void Handle_CustomerAgeLessThan18_ThrowsArgumentException(int age)
   {
     newCustomerDTO.Age = age;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
@@ -124,12 +113,12 @@ public class CreateCustomerRequestCommandHandlerTests
   [InlineData("")]
   [InlineData("qwerty")]
   [InlineData("jdoe@em")]
-  public void Handle_CustomerEmailInvalid_ThrowsArgumentException(string email)
+  public async void Handle_CustomerEmailInvalid_ThrowsArgumentException(string email)
   {
     newCustomerDTO.Email = email;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
@@ -149,12 +138,12 @@ public class CreateCustomerRequestCommandHandlerTests
   [InlineData("")]
   [InlineData("65665")]
   [InlineData("+1 123456798")]
-  public void Handle_CustomerPhoneNumberInvalid_ThrowsArgumentException(string phoneNumber)
+  public async void Handle_CustomerPhoneNumberInvalid_ThrowsArgumentException(string phoneNumber)
   {
     newCustomerDTO.PhoneNumber = phoneNumber;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
