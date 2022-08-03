@@ -53,6 +53,7 @@ public static class TestsConfiguration
     serviceCollection.AddScoped<GetCustomerByIdRequestHandler>();
     serviceCollection.AddScoped<CreateCustomerRequestCommandHandler>();
     serviceCollection.AddScoped<UpdateCustomerRequestCommandHandler>();
+    serviceCollection.AddScoped<DeleteCustomerRequestCommandHandler>();
 
     serviceCollection.AddTransient<NewCustomerDTO>(o => new()
     {
