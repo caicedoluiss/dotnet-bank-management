@@ -1,3 +1,4 @@
+using System;
 using BankManagement.Application.Utils;
 using BankManagement.Domain;
 
@@ -22,5 +23,30 @@ public class CustomerMappingProfile : ICustomerMappingProfile
     existentCustomer.UpdatedAt = sourceEntity.UpdatedAt.ToString(Constants.DateFormat);
 
     return existentCustomer;
+  }
+
+  public Customer Map(NewCustomerDTO sourceEntity)
+  {
+    PersonGender gender = PersonGender.None;
+    if (sourceEntity.Gender is not null)
+    {
+      if (!Enum.TryParse<PersonGender>(sourceEntity.Gender, out gender)
+          || !Enum.IsDefined<PersonGender>(gender))
+      {
+        throw new ArgumentException(nameof(sourceEntity.Gender));
+      }
+    }
+
+    Customer customer = new();
+
+    customer.IdNumber = sourceEntity.IdNumber;
+    customer.Name = sourceEntity.Name;
+    customer.Gender = gender;
+    customer.Age = sourceEntity.Age;
+    customer.PhoneNumber = sourceEntity.PhoneNumber;
+    customer.Email = sourceEntity.Email;
+    customer.State = sourceEntity.State;
+
+    return customer;
   }
 }
