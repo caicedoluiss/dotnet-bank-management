@@ -6,9 +6,9 @@ namespace BankManagement.Application;
 
 public class CustomerMappingProfile : ICustomerMappingProfile
 {
-  public ExistentCustomerDTO Map(Customer sourceEntity)
+  public ExistentCustomerDTO Map(Customer sourceEntity, ExistentCustomerDTO? destEntity = null)
   {
-    ExistentCustomerDTO existentCustomer = new();
+    ExistentCustomerDTO existentCustomer = destEntity is null ? new() : destEntity;
 
     existentCustomer.IdNumber = sourceEntity.IdNumber;
     existentCustomer.Name = sourceEntity.Name;
@@ -25,7 +25,7 @@ public class CustomerMappingProfile : ICustomerMappingProfile
     return existentCustomer;
   }
 
-  public Customer Map(NewCustomerDTO sourceEntity)
+  public Customer Map(NewCustomerDTO sourceEntity, Customer? destEntity = null)
   {
     PersonGender gender = PersonGender.None;
     if (sourceEntity.Gender is not null)
@@ -37,7 +37,7 @@ public class CustomerMappingProfile : ICustomerMappingProfile
       }
     }
 
-    Customer customer = new();
+    Customer customer = destEntity is null ? new() : destEntity;
 
     customer.IdNumber = sourceEntity.IdNumber;
     customer.Name = sourceEntity.Name;
