@@ -35,32 +35,32 @@ public class UpdateAccountRequestCommandHandlerTests
   }
 
   [Fact]
-  public void Handle_RequestNullAccountInfo_ThrowsArgumentException()
+  public async void Handle_RequestNullAccountInfo_ThrowsArgumentException()
   {
     request.AccountInfo = null;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_RequestAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     request.AccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_RequestAccountIdNonExistent_ThrowsArgumentException()
+  public async void Handle_RequestAccountIdNonExistent_ThrowsArgumentException()
   {
     request.AccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
@@ -77,43 +77,42 @@ public class UpdateAccountRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_CustomerIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_CustomerIdLessThan1_ThrowsArgumentException(int id)
   {
     newAccountDTO.CustomerId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_CustomerIdNonExistent_ThrowsArgumentException()
+  public async void Handle_CustomerIdNonExistent_ThrowsArgumentException()
   {
     newAccountDTO.CustomerId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_AccountNumberEmpty_ThrowsArgumentException()
+  public async void Handle_AccountNumberEmpty_ThrowsArgumentException()
   {
     newAccountDTO.Number = string.Empty;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData("")]
   [InlineData("NonExistentValue")]
   [InlineData("-1")]
-  public void Handle_AccountTypeInvalid_ThrowsArgumentException(string type)
+  public async void Handle_AccountTypeInvalid_ThrowsArgumentException(string type)
   {
     newAccountDTO.Type = type;
+    var action = () => handler.Handle(request, default);
 
-    Action action = () => handler.Handle(request, default);
-
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
@@ -125,7 +124,6 @@ public class UpdateAccountRequestCommandHandlerTests
   public async Task Handle_AccountTypeValid_ReturnsValidId(string type)
   {
     newAccountDTO.Type = type;
-
     var result = await handler.Handle(request, default);
 
     Assert.IsType<ExistentAccountDTO>(result);
@@ -137,7 +135,6 @@ public class UpdateAccountRequestCommandHandlerTests
   public async Task Handle_RequestGetCustomerInfoTrue_ReturnsExistentAccountDTOWithCustomerInfo()
   {
     request.RetrieveCustomerInfo = true;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -148,10 +145,9 @@ public class UpdateAccountRequestCommandHandlerTests
   }
 
   [Fact]
-  public async Task Handle_RequestGetCustomerInfoFalse_ReturnsExistentAccountDTOWithCustomerInfo()
+  public async Task Handle_RequestGetCustomerInfoFalse_ReturnsExistentAccountDTOWithNoCustomerInfo()
   {
     request.RetrieveCustomerInfo = false;
-
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
