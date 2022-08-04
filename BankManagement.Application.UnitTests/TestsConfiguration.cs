@@ -93,6 +93,7 @@ public static class TestsConfiguration
 
     serviceCollection.AddScoped<GetAccountByIdRequestHandler>();
     serviceCollection.AddScoped<CreateAccountRequestCommandHandler>();
+    serviceCollection.AddScoped<UpdateAccountRequestCommandHandler>();
 
 
     return serviceCollection;
