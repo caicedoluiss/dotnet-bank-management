@@ -1,3 +1,5 @@
+using System;
+using BankManagement.Application.Utils;
 using BankManagement.Domain;
 
 namespace BankManagement.Application;
@@ -27,5 +29,20 @@ public class AccountMappingProfile : IAccountMappingProfile
     existentAccount.UpdatedAt = sourceEntity.UpdatedAt;
 
     return existentAccount;
+  }
+
+  public Account Map(NewAccountDTO sourceEntity, Account? destEntity = null)
+  {
+    if (!EnumValidator.Validate(sourceEntity.Type, out AccountType type)) throw new ArgumentException(nameof(sourceEntity.Type));
+
+    Account account = destEntity is null ? new() : destEntity;
+
+    account.Number = sourceEntity.Number;
+    account.Type = type;
+    account.Balance = sourceEntity.Balance;
+    account.CustomerId = sourceEntity.CustomerId;
+    account.State = sourceEntity.State;
+
+    return account;
   }
 }
