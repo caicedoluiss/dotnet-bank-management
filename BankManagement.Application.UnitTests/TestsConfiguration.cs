@@ -92,6 +92,7 @@ public static class TestsConfiguration
     });
 
     serviceCollection.AddScoped<GetAccountByIdRequestHandler>();
+    serviceCollection.AddScoped<CreateAccountRequestCommandHandler>();
 
 
     return serviceCollection;
@@ -105,6 +106,8 @@ public static class TestsConfiguration
 
     mockCustomersRepo.Setup(x => x.Add(It.IsAny<Customer>())).Returns(Customers[0]);
 
+    mockCustomersRepo.Setup(x => x.Exist(1)).ReturnsAsync(true);
+
     return mockCustomersRepo.Object;
   }
 
@@ -113,6 +116,8 @@ public static class TestsConfiguration
     var mockAccountsRepo = new Mock<IAccountsRepo>();
     mockAccountsRepo.Setup(x => x.Get(1, false, It.IsAny<bool>())).ReturnsAsync(SampleAccount);
     mockAccountsRepo.Setup(x => x.Get(1, true, It.IsAny<bool>())).ReturnsAsync(SampleAccountWithCustomer);
+
+    mockAccountsRepo.Setup(x => x.Add(It.IsAny<Account>())).Returns(SampleAccount);
 
     return mockAccountsRepo.Object;
   }

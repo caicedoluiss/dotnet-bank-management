@@ -33,62 +33,60 @@ public class CreateAccountRequestCommandHandlerTests
   }
 
   [Fact]
-  public void Handle_RequestNullAccountInfo_ThrowsArgumentException()
+  public async void Handle_RequestNullAccountInfo_ThrowsArgumentException()
   {
     request.AccountInfo = null;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_CustomerIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_CustomerIdLessThan1_ThrowsArgumentException(int id)
   {
     newAccountDTO.CustomerId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_CustomerIdNonExistent_ThrowsArgumentException()
+  public async void Handle_CustomerIdNonExistent_ThrowsArgumentException()
   {
     newAccountDTO.CustomerId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_AccountNumberEmpty_ThrowsArgumentException()
+  public async void Handle_AccountNumberEmpty_ThrowsArgumentException()
   {
     newAccountDTO.Number = string.Empty;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData("")]
   [InlineData("NonExistentValue")]
   [InlineData("-1")]
-  public void Handle_AccountTypeInvalid_ThrowsArgumentException(string type)
+  public async void Handle_AccountTypeInvalid_ThrowsArgumentException(string type)
   {
     newAccountDTO.Type = type;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(null)]
   [InlineData("Savings")]
   [InlineData("Current")]
-  [InlineData("0")]
-  [InlineData("1")]
-  public async Task Handle_AccountTypeValid_ReturnsValidId(string type)
+  public async Task Handle_AccountTypeValid_ReturnsValidId(string? type)
   {
     newAccountDTO.Type = type;
 

@@ -27,15 +27,7 @@ public class CustomerMappingProfile : ICustomerMappingProfile
 
   public Customer Map(NewCustomerDTO sourceEntity, Customer? destEntity = null)
   {
-    PersonGender gender = PersonGender.None;
-    if (sourceEntity.Gender is not null)
-    {
-      if (!Enum.TryParse<PersonGender>(sourceEntity.Gender, out gender)
-          || !Enum.IsDefined<PersonGender>(gender))
-      {
-        throw new ArgumentException(nameof(sourceEntity.Gender));
-      }
-    }
+    if (!EnumValidator.Validate(sourceEntity.Gender, out PersonGender gender)) throw new ArgumentException(nameof(sourceEntity.Gender));
 
     Customer customer = destEntity is null ? new() : destEntity;
 
