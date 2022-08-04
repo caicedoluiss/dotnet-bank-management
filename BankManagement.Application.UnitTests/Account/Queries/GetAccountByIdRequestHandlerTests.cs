@@ -28,12 +28,12 @@ public class GetAccountByIdRequestHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestAccountIdLessThan1_ThrowsArgumentExcetion(int id)
+  public async void Handle_RequestAccountIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.AccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
@@ -52,7 +52,7 @@ public class GetAccountByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentAccountDTO>(result);
-    Assert.Equal(request.AccountId, result.Id);
+    Assert.Equal(request.AccountId, result!.Id);
     Assert.Null(result.Customer);
     Assert.True(result.CustomerId > 0);
   }
@@ -65,7 +65,7 @@ public class GetAccountByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentAccountDTO>(result);
-    Assert.Equal(request.AccountId, result.Id);
+    Assert.Equal(request.AccountId, result!.Id);
     Assert.NotNull(result.Customer);
     Assert.IsType<ExistentCustomerDTO>(result.Customer);
   }
@@ -78,7 +78,7 @@ public class GetAccountByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentAccountDTO>(result);
-    Assert.Equal(request.AccountId, result.Id);
+    Assert.Equal(request.AccountId, result!.Id);
     Assert.Null(result.Customer);
   }
 }

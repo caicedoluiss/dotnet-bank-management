@@ -27,21 +27,21 @@ public class DeleteAccountRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_RequestAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     request.AccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_RequestAccountIdNonExistent_ThrowsArgumentException()
+  public async void Handle_RequestAccountIdNonExistent_ThrowsArgumentException()
   {
     request.AccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
