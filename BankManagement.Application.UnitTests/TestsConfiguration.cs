@@ -34,6 +34,30 @@ public static class TestsConfiguration
       State = true
     },
   };
+  internal static Account SampleAccount = new()
+  {
+    Id = 1,
+    Number = "001",
+    Type = AccountType.Savings,
+    Balance = 500,
+    CustomerId = 1,
+    State = true,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+    Customer = null
+  };
+  internal static Account SampleAccountWithCustomer = new()
+  {
+    Id = 1,
+    Number = "001",
+    Type = AccountType.Savings,
+    Balance = 500,
+    CustomerId = 1,
+    State = true,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+    Customer = Customers[0]
+  };
 
   internal static IServiceProvider ServiceProvider { get; }
 
@@ -50,6 +74,7 @@ public static class TestsConfiguration
     serviceCollection.AddApplicationServices();
 
     serviceCollection.AddScoped<IUnitOfWork>(o => GetMockUnitOfWork());
+
     serviceCollection.AddScoped<GetCustomerByIdRequestHandler>();
     serviceCollection.AddScoped<CreateCustomerRequestCommandHandler>();
     serviceCollection.AddScoped<UpdateCustomerRequestCommandHandler>();
@@ -66,6 +91,8 @@ public static class TestsConfiguration
       State = true,
     });
 
+    serviceCollection.AddScoped<GetAccountByIdRequestHandler>();
+
 
     return serviceCollection;
   }
@@ -81,10 +108,20 @@ public static class TestsConfiguration
     return mockCustomersRepo.Object;
   }
 
+  private static IAccountsRepo GetMockAccountsRepo()
+  {
+    var mockAccountsRepo = new Mock<IAccountsRepo>();
+    mockAccountsRepo.Setup(x => x.Get(1, false, It.IsAny<bool>())).ReturnsAsync(SampleAccount);
+    mockAccountsRepo.Setup(x => x.Get(1, true, It.IsAny<bool>())).ReturnsAsync(SampleAccountWithCustomer);
+
+    return mockAccountsRepo.Object;
+  }
+
   private static IUnitOfWork GetMockUnitOfWork()
   {
     var mockUnitOfWork = new Mock<IUnitOfWork>();
     mockUnitOfWork.Setup(x => x.CustomersRepo).Returns(GetMockCustomersRepo());
+    mockUnitOfWork.Setup(x => x.AccountsRepo).Returns(GetMockAccountsRepo());
 
     return mockUnitOfWork.Object;
   }
