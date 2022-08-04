@@ -119,8 +119,6 @@ public class UpdateAccountRequestCommandHandlerTests
   [InlineData(null)]
   [InlineData("Savings")]
   [InlineData("Current")]
-  [InlineData("0")]
-  [InlineData("1")]
   public async Task Handle_AccountTypeValid_ReturnsValidId(string type)
   {
     newAccountDTO.Type = type;
