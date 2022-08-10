@@ -58,6 +58,38 @@ public static class TestsConfiguration
     UpdatedAt = DateTime.UtcNow,
     Customer = Customers[0]
   };
+  internal static Transaction SampleTransaction = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+  };
+  internal static Transaction SampleTransactionWithAccount = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+    Account = SampleAccount
+  };
+  internal static Transaction SampleTransactionWithAccountAndCustomer = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+    Account = SampleAccountWithCustomer
+  };
 
   internal static IServiceProvider ServiceProvider { get; }
 
@@ -96,6 +128,7 @@ public static class TestsConfiguration
     serviceCollection.AddScoped<UpdateAccountRequestCommandHandler>();
     serviceCollection.AddScoped<DeleteAccountRequestCommandHandler>();
 
+    serviceCollection.AddScoped<GetTransactionByIdRequestHandler>();
 
     return serviceCollection;
   }
@@ -124,11 +157,23 @@ public static class TestsConfiguration
     return mockAccountsRepo.Object;
   }
 
+  private static ITransactionsRepo GetMockTransactionsRepo()
+  {
+    var mockTransactionsRepo = new Mock<ITransactionsRepo>();
+    mockTransactionsRepo.Setup(x => x.Get(1, false, false, It.IsAny<bool>())).ReturnsAsync(SampleTransaction);
+    mockTransactionsRepo.Setup(x => x.Get(1, true, false, It.IsAny<bool>())).ReturnsAsync(SampleTransactionWithAccount);
+    mockTransactionsRepo.Setup(x => x.Get(1, true, true, It.IsAny<bool>())).ReturnsAsync(SampleTransactionWithAccountAndCustomer);
+    mockTransactionsRepo.Setup(x => x.Get(1, false, true, It.IsAny<bool>())).ReturnsAsync(SampleTransactionWithAccountAndCustomer);
+
+    return mockTransactionsRepo.Object;
+  }
+
   private static IUnitOfWork GetMockUnitOfWork()
   {
     var mockUnitOfWork = new Mock<IUnitOfWork>();
     mockUnitOfWork.Setup(x => x.CustomersRepo).Returns(GetMockCustomersRepo());
     mockUnitOfWork.Setup(x => x.AccountsRepo).Returns(GetMockAccountsRepo());
+    mockUnitOfWork.Setup(x => x.TransactionsRepo).Returns(GetMockTransactionsRepo());
 
     return mockUnitOfWork.Object;
   }
