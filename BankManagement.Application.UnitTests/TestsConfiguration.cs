@@ -129,6 +129,7 @@ public static class TestsConfiguration
     serviceCollection.AddScoped<DeleteAccountRequestCommandHandler>();
 
     serviceCollection.AddScoped<GetTransactionByIdRequestHandler>();
+    serviceCollection.AddScoped<AddTransactionRequestCommandHandler>();
 
     return serviceCollection;
   }
@@ -154,6 +155,8 @@ public static class TestsConfiguration
 
     mockAccountsRepo.Setup(x => x.Add(It.IsAny<Account>())).Returns(SampleAccount);
 
+    mockAccountsRepo.Setup(x => x.Exist(1)).ReturnsAsync(true);
+
     return mockAccountsRepo.Object;
   }
 
@@ -164,6 +167,8 @@ public static class TestsConfiguration
     mockTransactionsRepo.Setup(x => x.Get(1, true, false, It.IsAny<bool>())).ReturnsAsync(SampleTransactionWithAccount);
     mockTransactionsRepo.Setup(x => x.Get(1, true, true, It.IsAny<bool>())).ReturnsAsync(SampleTransactionWithAccountAndCustomer);
     mockTransactionsRepo.Setup(x => x.Get(1, false, true, It.IsAny<bool>())).ReturnsAsync(SampleTransactionWithAccountAndCustomer);
+
+    mockTransactionsRepo.Setup(x => x.Add(It.IsAny<Transaction>())).Returns(SampleTransaction);
 
     return mockTransactionsRepo.Object;
   }
