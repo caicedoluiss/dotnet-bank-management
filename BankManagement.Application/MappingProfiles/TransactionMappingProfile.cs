@@ -1,3 +1,4 @@
+using System;
 using BankManagement.Application.Utils;
 using BankManagement.Domain;
 
@@ -27,5 +28,22 @@ public class TransactionMappingProfile : ITransactionMappingProfile
     existentTransaction.UpdatedAt = sourceEntity.UpdatedAt.ToString(Constants.DateFormat);
 
     return existentTransaction;
+  }
+
+  public Transaction Map(UpdatingTransactionDTO sourceEntity, Transaction? destEntity = null)
+  {
+    if (!DateTime.TryParseExact(sourceEntity.Date, Constants.DateFormat, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime date))
+    {
+      throw new ArgumentException(nameof(sourceEntity.Date));
+    }
+
+    Transaction transaction = destEntity is null ? new() : destEntity;
+
+    transaction.AccountId = sourceEntity.AccountId;
+    transaction.Balance = sourceEntity.Balance;
+    transaction.Date = date;
+    transaction.Value = sourceEntity.Value;
+
+    return transaction;
   }
 }
