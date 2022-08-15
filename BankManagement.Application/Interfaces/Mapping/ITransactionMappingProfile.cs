@@ -5,6 +5,7 @@ namespace BankManagement.Application;
 public interface ITransactionMappingProfile :
     IMapper<Transaction, ExistentTransactionDTO>
     , IMapper<UpdatingTransactionDTO, Transaction>
+    , IMapper<NewTransactionDTO, Transaction>
 {
 
 }

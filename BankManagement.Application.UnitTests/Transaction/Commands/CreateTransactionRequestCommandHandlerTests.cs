@@ -31,32 +31,32 @@ public class CreateTransactionRequestCommandHandlerTests
 
 
   [Fact]
-  public void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
+  public async void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
   {
     request.TransactionInfo = null;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_TransactionAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_TransactionAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     newTransactionDTO.AccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_TransactionAccountIdNonExistent_ThrowsArgumentException()
+  public async void Handle_TransactionAccountIdNonExistent_ThrowsArgumentException()
   {
     newTransactionDTO.AccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
