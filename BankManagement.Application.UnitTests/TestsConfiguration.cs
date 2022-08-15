@@ -130,6 +130,7 @@ public static class TestsConfiguration
 
     serviceCollection.AddScoped<GetTransactionByIdRequestHandler>();
     serviceCollection.AddScoped<AddTransactionRequestCommandHandler>();
+    serviceCollection.AddScoped<CreateTransactionRequestCommandHandler>();
 
     return serviceCollection;
   }
