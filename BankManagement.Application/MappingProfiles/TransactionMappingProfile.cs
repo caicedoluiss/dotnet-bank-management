@@ -46,4 +46,14 @@ public class TransactionMappingProfile : ITransactionMappingProfile
 
     return transaction;
   }
+
+  public Transaction Map(NewTransactionDTO sourceEntity, Transaction? destEntity = null)
+  {
+    Transaction transaction = destEntity is null ? new() : destEntity;
+
+    transaction.AccountId = sourceEntity.AccountId;
+    transaction.Value = sourceEntity.Value;
+
+    return transaction;
+  }
 }
