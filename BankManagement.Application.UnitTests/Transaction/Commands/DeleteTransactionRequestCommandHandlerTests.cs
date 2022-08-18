@@ -29,21 +29,21 @@ public class DeleteTransactionRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestTransactionIdLessThan1_ThrowsArgumentExcetion(int id)
+  public async void Handle_RequestTransactionIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.TransactionId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_RequestTransactionIdNonExistent_ThrowsArgumentExcetion()
+  public async void Handle_RequestTransactionIdNonExistent_ThrowsArgumentExcetion()
   {
     request.TransactionId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
