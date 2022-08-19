@@ -36,32 +36,32 @@ public class UpdateTransactionRequestCommandHandlerTests
 
 
   [Fact]
-  public void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
+  public async void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
   {
     request.TransanctionInfo = null;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestTransactionIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_RequestTransactionIdLessThan1_ThrowsArgumentException(int id)
   {
     request.TransactionId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_RequestTransactionIdNonExistent_ThrowsArgumentException()
+  public async void Handle_RequestTransactionIdNonExistent_ThrowsArgumentException()
   {
     request.TransactionId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
@@ -80,21 +80,21 @@ public class UpdateTransactionRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_TransactionAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_TransactionAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     transactionDTO.AccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_TransactionAccountIdNonExistent_ThrowsArgumentException()
+  public async void Handle_TransactionAccountIdNonExistent_ThrowsArgumentException()
   {
     transactionDTO.AccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
@@ -102,12 +102,12 @@ public class UpdateTransactionRequestCommandHandlerTests
   [InlineData("")]
   [InlineData("qwerty")]
   [InlineData("07-28-2022")]
-  public void Handle_TransactionDateInvalid_ThrowsArgumentException(string? date)
+  public async void Handle_TransactionDateInvalid_ThrowsArgumentException(string? date)
   {
     transactionDTO.Date = date;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]

@@ -6,5 +6,6 @@ public interface IUnitOfWork
 {
   ICustomersRepo CustomersRepo { get; }
   IAccountsRepo AccountsRepo { get; }
+  ITransactionsRepo TransactionsRepo { get; }
   Task<int> Complete();
 }

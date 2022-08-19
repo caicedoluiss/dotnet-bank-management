@@ -28,12 +28,12 @@ public class GetTransactionByIdRequestHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestTransactionIdLessThan1_ThrowsArgumentExcetion(int id)
+  public async void Handle_RequestTransactionIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.TransactionId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
@@ -52,7 +52,7 @@ public class GetTransactionByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
-    Assert.Equal(request.TransactionId, result.Id);
+    Assert.Equal(request.TransactionId, result!.Id);
     Assert.True(result.Id > 0);
     Assert.Null(result.Account);
     Assert.True(result.AccountId > 0);
@@ -66,7 +66,7 @@ public class GetTransactionByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
-    Assert.Equal(request.TransactionId, result.Id);
+    Assert.Equal(request.TransactionId, result!.Id);
     Assert.NotNull(result.Account);
     Assert.IsType<ExistentAccountDTO>(result.Account);
   }
@@ -79,7 +79,7 @@ public class GetTransactionByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
-    Assert.Equal(request.TransactionId, result.Id);
+    Assert.Equal(request.TransactionId, result!.Id);
     Assert.Null(result.Account);
   }
 
@@ -91,7 +91,7 @@ public class GetTransactionByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
-    Assert.Equal(request.TransactionId, result.Id);
+    Assert.Equal(request.TransactionId, result!.Id);
     Assert.NotNull(result.Account);
     Assert.IsType<ExistentAccountDTO>(result.Account);
     Assert.NotNull(result.Account?.Customer);
@@ -107,7 +107,7 @@ public class GetTransactionByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransactionDTO>(result);
-    Assert.Equal(request.TransactionId, result.Id);
+    Assert.Equal(request.TransactionId, result!.Id);
     Assert.NotNull(result.Account);
     Assert.IsType<ExistentAccountDTO>(result.Account);
     Assert.Null(result.Account!.Customer);
