@@ -91,6 +91,66 @@ public static class TestsConfiguration
     Account = SampleAccountWithCustomer
   };
 
+  internal static Transfer SampleTransfer = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    DestinationAccountId = 2,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+  };
+  internal static Transfer SampleTransferWithAccount = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    Account = SampleAccount,
+    DestinationAccountId = 2,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+  };
+  internal static Transfer SampleTransferWithAccountAndCustomer = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    Account = SampleAccountWithCustomer,
+    DestinationAccountId = 2,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+  };
+  internal static Transfer SampleTransferWithDestinationAccount = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    DestinationAccountId = 2,
+    DestinationAccount = SampleAccount,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+  };
+  internal static Transfer SampleTransferWithDestinationAccountAndItsCustomer = new()
+  {
+    Id = 1,
+    Balance = 800,
+    Date = DateTime.Now.AddDays(-1).ToUniversalTime(),
+    Value = 200,
+    AccountId = 1,
+    DestinationAccountId = 2,
+    DestinationAccount = SampleAccountWithCustomer,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+  };
+
   internal static IServiceProvider ServiceProvider { get; }
 
   static TestsConfiguration()
@@ -134,6 +194,8 @@ public static class TestsConfiguration
     serviceCollection.AddScoped<UpdateTransactionRequestCommandHandler>();
     serviceCollection.AddScoped<DeleteTransactionRequestCommandHandler>();
 
+    serviceCollection.AddScoped<GetTransferByIdRequestHandler>();
+
     return serviceCollection;
   }
 
@@ -176,12 +238,25 @@ public static class TestsConfiguration
     return mockTransactionsRepo.Object;
   }
 
+  private static ITransfersRepo GetMockTransfersRepo()
+  {
+    var mockTransferRepo = new Mock<ITransfersRepo>();
+    mockTransferRepo.Setup(x => x.Get(1, false, false, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync(SampleTransfer);
+    mockTransferRepo.Setup(x => x.Get(1, true, false, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync(SampleTransferWithAccount);
+    mockTransferRepo.Setup(x => x.Get(1, It.IsAny<bool>(), true, false, false, It.IsAny<bool>())).ReturnsAsync(SampleTransferWithAccountAndCustomer);
+    mockTransferRepo.Setup(x => x.Get(1, It.IsAny<bool>(), It.IsAny<bool>(), true, false, It.IsAny<bool>())).ReturnsAsync(SampleTransferWithDestinationAccount);
+    mockTransferRepo.Setup(x => x.Get(1, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), true, It.IsAny<bool>())).ReturnsAsync(SampleTransferWithDestinationAccountAndItsCustomer);
+
+    return mockTransferRepo.Object;
+  }
+
   private static IUnitOfWork GetMockUnitOfWork()
   {
     var mockUnitOfWork = new Mock<IUnitOfWork>();
     mockUnitOfWork.Setup(x => x.CustomersRepo).Returns(GetMockCustomersRepo());
     mockUnitOfWork.Setup(x => x.AccountsRepo).Returns(GetMockAccountsRepo());
     mockUnitOfWork.Setup(x => x.TransactionsRepo).Returns(GetMockTransactionsRepo());
+    mockUnitOfWork.Setup(x => x.TransfersRepo).Returns(GetMockTransfersRepo());
 
     return mockUnitOfWork.Object;
   }
