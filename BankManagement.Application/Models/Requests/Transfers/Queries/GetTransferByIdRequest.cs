@@ -2,7 +2,7 @@ using MediatR;
 
 namespace BankManagement.Application;
 
-public class GetTransferByIdRequest : IRequest<ExistentTransferDTO>
+public class GetTransferByIdRequest : IRequest<ExistentTransferDTO?>
 {
   public int TransferId { get; set; }
   public bool RetrieveAccountInfo { get; set; }
