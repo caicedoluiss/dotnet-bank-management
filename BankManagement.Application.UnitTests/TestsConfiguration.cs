@@ -208,6 +208,7 @@ public static class TestsConfiguration
 
     serviceCollection.AddScoped<GetTransferByIdRequestHandler>();
     serviceCollection.AddScoped<AddTransferRequestCommandHandler>();
+    serviceCollection.AddScoped<CreateTransferRequestCommandHandler>();
 
     return serviceCollection;
   }
@@ -236,6 +237,9 @@ public static class TestsConfiguration
     mockAccountsRepo.Setup(x => x.Exist(1)).ReturnsAsync(true);
 
     mockAccountsRepo.Setup(x => x.Exist(2)).ReturnsAsync(true);
+
+    mockAccountsRepo.Setup(x => x.Get(2, It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync(SampleAccount2);
+
 
     return mockAccountsRepo.Object;
   }
