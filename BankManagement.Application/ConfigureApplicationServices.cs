@@ -9,6 +9,7 @@ public static class ConfigureApplicationServices
     services.AddSingleton<ICustomerMappingProfile, CustomerMappingProfile>();
     services.AddSingleton<IAccountMappingProfile, AccountMappingProfile>();
     services.AddSingleton<ITransactionMappingProfile, TransactionMappingProfile>();
+    services.AddSingleton<ITransferMappingProfile, TransferMappingProfile>();
 
     return services;
   }

@@ -32,68 +32,79 @@ public class CreateTransferRequestCommandHandlerTests
 
 
   [Fact]
-  public void Handle_RequestNullTransferInfo_ThrowsArgumentException()
+  public async void Handle_RequestNullTransferInfo_ThrowsArgumentException()
   {
     request.TrasnferInfo = null;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_TransferAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_TransferAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     newTransferDTO.AccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_TransferAccountIdNonExistent_ThrowsArgumentException()
+  public async void Handle_TransferAccountIdNonExistent_ThrowsArgumentException()
   {
     newTransferDTO.AccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_TransferDestinationAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_TransferDestinationAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     newTransferDTO.DestinationAccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_TransferDestinationAccountIdNonExistent_ThrowsArgumentException()
+  public async void Handle_TransferDestinationAccountIdNonExistent_ThrowsArgumentException()
   {
     newTransferDTO.DestinationAccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_TransferValueEquals0_ThrowsArgumentException()
+  public async void Handle_TransferValueEquals0_ThrowsArgumentException()
   {
     newTransferDTO.Value = 0;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
-  [InlineData(-1000)]
+  [InlineData(0)]
+  [InlineData(-1)]
+  public async void Handle_TransferValueLessOrEqualsThan0_ThrowsArgumentException(decimal value)
+  {
+    newTransferDTO.Value = value;
+    var action = () => handler.Handle(request, default);
+
+    await Assert.ThrowsAsync<ArgumentException>(action);
+  }
+
+  [Theory]
+  [InlineData(0.1)]
   [InlineData(1000)]
   [InlineData(55.09)]
-  [InlineData(-895.14)]
+  [InlineData(895.14)]
   public async Task Handle_TransferValueValid_ReturnsValidId(decimal value)
   {
     newTransferDTO.Value = value;

@@ -30,12 +30,12 @@ public class GetTransferByIdRequestHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestTransferIdLessThan1_ThrowsArgumentExcetion(int id)
+  public async void Handle_RequestTransferIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.TransferId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
@@ -54,7 +54,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.True(result.Id > 0);
+    Assert.True(result!.Id > 0);
     Assert.Equal(request.TransferId, result.Id);
     Assert.Null(result.Account);
     Assert.Null(result.DestinationAccountInfo);
@@ -70,7 +70,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.NotNull(result.Account);
     Assert.IsType<ExistentAccountDTO>(result.Account);
   }
@@ -83,7 +83,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.NotNull(result.DestinationAccountInfo);
     Assert.IsType<ExistentAccountDTO>(result.DestinationAccountInfo);
   }
@@ -96,7 +96,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.Null(result.Account);
   }
 
@@ -108,7 +108,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.Null(result.DestinationAccountInfo);
   }
 
@@ -120,7 +120,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.NotNull(result.Account);
     Assert.IsType<ExistentAccountDTO>(result.Account);
     Assert.NotNull(result.Account?.Customer);
@@ -135,7 +135,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.NotNull(result.DestinationAccountInfo);
     Assert.IsType<ExistentAccountDTO>(result.DestinationAccountInfo);
     Assert.NotNull(result.DestinationAccountInfo?.Customer);
@@ -151,7 +151,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.NotNull(result.Account);
     Assert.IsType<ExistentAccountDTO>(result.Account);
     Assert.Null(result.Account!.Customer);
@@ -166,7 +166,7 @@ public class GetTransferByIdRequestHandlerTests
 
     Assert.NotNull(result);
     Assert.IsType<ExistentTransferDTO>(result);
-    Assert.Equal(request.TransferId, result.Id);
+    Assert.Equal(request.TransferId, result!.Id);
     Assert.NotNull(result.DestinationAccountInfo);
     Assert.IsType<ExistentAccountDTO>(result.DestinationAccountInfo);
     Assert.Null(result.DestinationAccountInfo!.Customer);
