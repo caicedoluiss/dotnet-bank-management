@@ -210,6 +210,7 @@ public static class TestsConfiguration
     serviceCollection.AddScoped<AddTransferRequestCommandHandler>();
     serviceCollection.AddScoped<CreateTransferRequestCommandHandler>();
     serviceCollection.AddScoped<UpdateTransferRequestCommandHandler>();
+    serviceCollection.AddScoped<DeleteTransferRequestCommandHandler>();
 
     return serviceCollection;
   }
