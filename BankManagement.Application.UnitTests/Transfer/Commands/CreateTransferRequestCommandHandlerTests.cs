@@ -26,7 +26,7 @@ public class CreateTransferRequestCommandHandlerTests
 
     request = new()
     {
-      TrasnferInfo = newTransferDTO
+      TransferInfo = newTransferDTO
     };
   }
 
@@ -34,7 +34,7 @@ public class CreateTransferRequestCommandHandlerTests
   [Fact]
   public async void Handle_RequestNullTransferInfo_ThrowsArgumentException()
   {
-    request.TrasnferInfo = null;
+    request.TransferInfo = null;
     var action = () => handler.Handle(request, default);
 
     await Assert.ThrowsAsync<ArgumentException>(action);
@@ -95,6 +95,15 @@ public class CreateTransferRequestCommandHandlerTests
   public async void Handle_TransferValueLessOrEqualsThan0_ThrowsArgumentException(decimal value)
   {
     newTransferDTO.Value = value;
+    var action = () => handler.Handle(request, default);
+
+    await Assert.ThrowsAsync<ArgumentException>(action);
+  }
+
+  [Fact]
+  public async void Handle_TransferDestinationAccountIdSameAsAccountId_ThrowsArgumentException()
+  {
+    newTransferDTO.DestinationAccountId = newTransferDTO.AccountId;
     var action = () => handler.Handle(request, default);
 
     await Assert.ThrowsAsync<ArgumentException>(action);

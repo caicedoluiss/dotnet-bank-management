@@ -25,8 +25,8 @@ public class AccountMappingProfile : IAccountMappingProfile
     existentAccount.Customer = sourceEntity.Customer is null ? null : customerMappingProfile.Map(sourceEntity.Customer);
 
     existentAccount.Id = sourceEntity.Id;
-    existentAccount.CreatedAt = sourceEntity.CreatedAt;
-    existentAccount.UpdatedAt = sourceEntity.UpdatedAt;
+    existentAccount.CreatedAt = sourceEntity.CreatedAt.ToString(Constants.DateFormat);
+    existentAccount.UpdatedAt = sourceEntity.UpdatedAt.ToString(Constants.DateFormat);
 
     return existentAccount;
   }

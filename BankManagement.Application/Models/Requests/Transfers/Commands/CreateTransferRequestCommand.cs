@@ -4,5 +4,5 @@ namespace BankManagement.Application;
 
 public class CreateTransferRequestCommand : IRequest<int>
 {
-  public NewTransferDTO? TrasnferInfo { get; set; }
+  public NewTransferDTO? TransferInfo { get; set; }
 }

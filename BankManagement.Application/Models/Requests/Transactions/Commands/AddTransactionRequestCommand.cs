@@ -4,5 +4,5 @@ namespace BankManagement.Application;
 
 public class AddTransactionRequestCommand : IRequest<int>
 {
-  public UpdatingTransactionDTO? TransctionInfo { get; set; }
+  public UpdatingTransactionDTO? TransactionInfo { get; set; }
 }

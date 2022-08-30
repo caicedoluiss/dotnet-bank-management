@@ -28,7 +28,7 @@ public class AddTransferRequestCommandHandlerTests
 
     request = new()
     {
-      TrasnferInfo = transferDTO
+      TransferInfo = transferDTO
     };
   }
 
@@ -36,7 +36,7 @@ public class AddTransferRequestCommandHandlerTests
   [Fact]
   public async void Handle_RequestNullTransferInfo_ThrowsArgumentException()
   {
-    request.TrasnferInfo = null;
+    request.TransferInfo = null;
     var action = () => handler.Handle(request, default);
 
     await Assert.ThrowsAsync<ArgumentException>(action);

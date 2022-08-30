@@ -20,7 +20,7 @@ public class GetAccountByIdRequestHandlerTests
     request = new()
     {
       AccountId = 1,
-      RetreiveCustomerInfo = false
+      RetrieveCustomerInfo = false
     };
   }
 
@@ -60,7 +60,7 @@ public class GetAccountByIdRequestHandlerTests
   [Fact]
   public async Task Handle_RequestGetCustomerInfoTrue_ReturnsExistentAccountDTOWithCustomerInfo()
   {
-    request.RetreiveCustomerInfo = true;
+    request.RetrieveCustomerInfo = true;
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);
@@ -73,7 +73,7 @@ public class GetAccountByIdRequestHandlerTests
   [Fact]
   public async Task Handle_RequestGetCustomerInfoFalse_ReturnsExistentAccountDTOWithNoCustomerInfo()
   {
-    request.RetreiveCustomerInfo = false;
+    request.RetrieveCustomerInfo = false;
     var result = await handler.Handle(request, default);
 
     Assert.NotNull(result);

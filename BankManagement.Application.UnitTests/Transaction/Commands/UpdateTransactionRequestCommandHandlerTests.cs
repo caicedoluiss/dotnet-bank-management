@@ -28,7 +28,7 @@ public class UpdateTransactionRequestCommandHandlerTests
     request = new()
     {
       TransactionId = 1,
-      TransanctionInfo = transactionDTO,
+      TransactionInfo = transactionDTO,
       RetrieveAccountInfo = false,
       RetrieveCustomerInfo = false
     };
@@ -38,7 +38,7 @@ public class UpdateTransactionRequestCommandHandlerTests
   [Fact]
   public async void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
   {
-    request.TransanctionInfo = null;
+    request.TransactionInfo = null;
     var action = () => handler.Handle(request, default);
 
     await Assert.ThrowsAsync<ArgumentException>(action);
