@@ -22,14 +22,14 @@ public class UpdateTransactionRequestCommandHandler : IRequestHandler<UpdateTran
     var transaction = await unitOfwork.TransactionsRepo.Get(request.TransactionId, request.RetrieveAccountInfo, request.RetrieveCustomerInfo);
 
     if (transaction is null) throw new ArgumentException(nameof(request.TransactionId));
-    if (request.TransanctionInfo is null) throw new ArgumentException(nameof(request.TransanctionInfo));
+    if (request.TransactionInfo is null) throw new ArgumentException(nameof(request.TransactionInfo));
 
     var validator = new UpdatingTransactionDTOValidator(unitOfwork);
-    var validationResult = await validator.ValidateAsync(request.TransanctionInfo, cancellationToken);
+    var validationResult = await validator.ValidateAsync(request.TransactionInfo, cancellationToken);
 
     if (!validationResult.IsValid) throw new ArgumentException(string.Join(", ", validationResult.Errors.Select(x => x.PropertyName)));
 
-    _ = mappingProfile.Map(request.TransanctionInfo, transaction);
+    _ = mappingProfile.Map(request.TransactionInfo, transaction);
 
     unitOfwork.TransactionsRepo.Update(transaction);
     _ = await unitOfwork.Complete();

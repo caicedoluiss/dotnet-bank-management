@@ -29,7 +29,7 @@ public class UpdateTransferRequestCommandHandlerTest
     request = new()
     {
       TransferId = 1,
-      TransanctionInfo = transferDTO,
+      TransactionInfo = transferDTO,
       RetrieveAccountInfo = false,
       RetrieveCustomerInfo = false,
       RetrieveDestinationAccountInfo = false,
@@ -41,7 +41,7 @@ public class UpdateTransferRequestCommandHandlerTest
   [Fact]
   public async void Handle_RequestNullTransferInfo_ThrowsArgumentException()
   {
-    request.TransanctionInfo = null;
+    request.TransactionInfo = null;
     var action = () => handler.Handle(request, default);
 
     await Assert.ThrowsAsync<ArgumentException>(action);

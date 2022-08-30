@@ -23,7 +23,7 @@ public class GetAccountByIdRequestHandler : IRequestHandler<GetAccountByIdReques
 
     ExistentAccountDTO? result = null;
 
-    var account = await unitOfWork.AccountsRepo.Get(request.AccountId, request.RetreiveCustomerInfo);
+    var account = await unitOfWork.AccountsRepo.Get(request.AccountId, request.RetrieveCustomerInfo);
 
     if (account is not null)
       result = mappingProfile.Map(account);

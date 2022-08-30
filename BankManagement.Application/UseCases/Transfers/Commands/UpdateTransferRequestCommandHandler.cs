@@ -23,14 +23,14 @@ public class UpdateTransferRequestCommandHandler : IRequestHandler<UpdateTransfe
                                                 , request.RetrieveDestinationAccountInfo, request.RetrieveDestinationAccountCustomerInfo);
 
     if (transfer is null) throw new ArgumentException(nameof(request.TransferId));
-    if (request.TransanctionInfo is null) throw new ArgumentException(nameof(request.TransanctionInfo));
+    if (request.TransactionInfo is null) throw new ArgumentException(nameof(request.TransactionInfo));
 
     var validator = new UpdatingTransferDTOValidator(unitOfwork);
-    var validationResult = await validator.ValidateAsync(request.TransanctionInfo, cancellationToken);
+    var validationResult = await validator.ValidateAsync(request.TransactionInfo, cancellationToken);
 
     if (!validationResult.IsValid) throw new ArgumentException(string.Join(", ", validationResult.Errors.Select(x => x.PropertyName)));
 
-    _ = mappingProfile.Map(request.TransanctionInfo, transfer);
+    _ = mappingProfile.Map(request.TransactionInfo, transfer);
 
     unitOfwork.TransfersRepo.Update(transfer);
     _ = await unitOfwork.Complete();

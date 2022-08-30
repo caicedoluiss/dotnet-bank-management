@@ -20,14 +20,14 @@ public class AddTransferRequestCommandHandler : IRequestHandler<AddTransferReque
 
   public async Task<int> Handle(AddTransferRequestCommand request, CancellationToken cancellationToken)
   {
-    if (request.TrasnferInfo is null) throw new ArgumentException(nameof(request.TrasnferInfo));
+    if (request.TransferInfo is null) throw new ArgumentException(nameof(request.TransferInfo));
 
     var validator = new UpdatingTransferDTOValidator(unitOfwork);
-    var validationResult = await validator.ValidateAsync(request.TrasnferInfo, cancellationToken);
+    var validationResult = await validator.ValidateAsync(request.TransferInfo, cancellationToken);
 
     if (!validationResult.IsValid) throw new ArgumentException(string.Join(", ", validationResult.Errors.Select(x => x.PropertyName)));
 
-    Transfer transfer = mappingProfile.Map(request.TrasnferInfo);
+    Transfer transfer = mappingProfile.Map(request.TransferInfo);
 
     Transfer result = unitOfwork.TransfersRepo.Add(transfer);
     _ = await unitOfwork.Complete();

@@ -93,7 +93,7 @@ public class CreateAccountRequestCommandHandlerTests
     var result = await handler.Handle(request, default);
 
     Assert.IsType<int>(result);
-    Assert.NotEqual(result, default);
+    Assert.NotEqual(default, result);
     Assert.True(result > 0);
   }
 }

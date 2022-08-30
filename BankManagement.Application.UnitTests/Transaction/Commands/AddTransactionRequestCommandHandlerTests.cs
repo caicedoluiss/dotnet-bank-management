@@ -27,7 +27,7 @@ public class AddTransactionRequestCommandHandlerTests
 
     request = new()
     {
-      TransctionInfo = transactionDTO
+      TransactionInfo = transactionDTO
     };
   }
 
@@ -35,7 +35,7 @@ public class AddTransactionRequestCommandHandlerTests
   [Fact]
   public async void Handle_RequestNullTransactionInfo_ThrowsArgumentException()
   {
-    request.TransctionInfo = null;
+    request.TransactionInfo = null;
     var action = () => handler.Handle(request, default);
 
     await Assert.ThrowsAsync<ArgumentException>(action);
