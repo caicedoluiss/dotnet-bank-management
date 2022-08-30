@@ -21,7 +21,7 @@ public class AddTransferRequestCommandHandlerTests
     {
       AccountId = 1,
       Date = "2022-07-29 00:00:00.000-5:00",
-      Value = -50.76M,
+      Value = 50.76M,
       Balance = 1550.67M,
       DestinationAccountId = 2
     };
@@ -34,52 +34,61 @@ public class AddTransferRequestCommandHandlerTests
 
 
   [Fact]
-  public void Handle_RequestNullTransferInfo_ThrowsArgumentException()
+  public async void Handle_RequestNullTransferInfo_ThrowsArgumentException()
   {
     request.TrasnferInfo = null;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_TransferAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_TransferAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     transferDTO.AccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_TransferAccountIdNonExistentId_ThrowsArgumentException()
+  public async void Handle_TransferAccountIdNonExistentId_ThrowsArgumentException()
   {
     transferDTO.AccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_TransferDestinationAccountIdLessThan1_ThrowsArgumentException(int id)
+  public async void Handle_TransferDestinationAccountIdLessThan1_ThrowsArgumentException(int id)
   {
     transferDTO.DestinationAccountId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_TransferDestinationAccountIdNonExistentId_ThrowsArgumentException()
+  public async void Handle_TransferDestinationAccountIdNonExistentId_ThrowsArgumentException()
   {
     transferDTO.DestinationAccountId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
+  }
+
+  [Fact]
+  public async void Handle_TransferDestinationAccountIdSameAsAccountId_ThrowsArgumentException()
+  {
+    transferDTO.DestinationAccountId = transferDTO.AccountId;
+    var action = () => handler.Handle(request, default);
+
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
@@ -87,12 +96,12 @@ public class AddTransferRequestCommandHandlerTests
   [InlineData("")]
   [InlineData("qwerty")]
   [InlineData("07-28-2022")]
-  public void Handle_TransferDateInvalid_ThrowsArgumentException(string? date)
+  public async void Handle_TransferDateInvalid_ThrowsArgumentException(string? date)
   {
     transferDTO.Date = date;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
@@ -109,20 +118,22 @@ public class AddTransferRequestCommandHandlerTests
     Assert.True(result > 0);
   }
 
-  [Fact]
-  public void Handle_TransferValueEquals0_ThrowsArgumentException()
+  [Theory]
+  [InlineData(0)]
+  [InlineData(-1)]
+  public async void Handle_TransferValueLessOrEqualsThan0_ThrowsArgumentException(decimal value)
   {
-    transferDTO.Value = 0;
-    Action action = () => handler.Handle(request, default);
+    transferDTO.Value = value;
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Theory]
-  [InlineData(-1000)]
+  [InlineData(0.1)]
   [InlineData(1000)]
   [InlineData(55.09)]
-  [InlineData(-895.14)]
+  [InlineData(895.14)]
   public async Task Handle_TransferValueValueValid_ReturnsExistentTransferDTO(decimal value)
   {
     transferDTO.Value = value;
