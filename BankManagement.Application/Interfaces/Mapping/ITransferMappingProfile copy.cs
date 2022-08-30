@@ -5,6 +5,7 @@ namespace BankManagement.Application;
 public interface ITransferMappingProfile :
     IMapper<Transfer, ExistentTransferDTO>
     , IMapper<UpdatingTransferDTO, Transfer>
+    , IMapper<NewTransferDTO, Transfer>
 {
 
 }

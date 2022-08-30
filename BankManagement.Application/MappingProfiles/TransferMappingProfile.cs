@@ -35,4 +35,15 @@ public class TransferMappingProfile : ITransferMappingProfile
 
     return transfer;
   }
+
+  public Transfer Map(NewTransferDTO sourceEntity, Transfer? destEntity = null)
+  {
+    Transfer transfer = destEntity is null ? new() : destEntity;
+
+    _ = transactionMappingProfile.Map(sourceEntity, transfer);
+
+    transfer.DestinationAccountId = sourceEntity.DestinationAccountId;
+
+    return transfer;
+  }
 }
