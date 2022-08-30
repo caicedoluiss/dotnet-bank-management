@@ -31,21 +31,21 @@ public class DeleteTransferRequestCommandHandlerTests
   [Theory]
   [InlineData(-1)]
   [InlineData(0)]
-  public void Handle_RequestTransferIdLessThan1_ThrowsArgumentExcetion(int id)
+  public async void Handle_RequestTransferIdLessThan1_ThrowsArgumentExcetion(int id)
   {
     request.TransferId = id;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
-  public void Handle_RequestTransferIdNonExistent_ThrowsArgumentExcetion()
+  public async void Handle_RequestTransferIdNonExistent_ThrowsArgumentExcetion()
   {
     request.TransferId = int.MaxValue;
-    Action action = () => handler.Handle(request, default);
+    var action = () => handler.Handle(request, default);
 
-    Assert.Throws<ArgumentException>(action);
+    await Assert.ThrowsAsync<ArgumentException>(action);
   }
 
   [Fact]
