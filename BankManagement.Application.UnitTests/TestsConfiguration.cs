@@ -46,6 +46,18 @@ public static class TestsConfiguration
     UpdatedAt = DateTime.UtcNow,
     Customer = null
   };
+  internal static Account SampleAccount2 = new()
+  {
+    Id = 2,
+    Number = "002",
+    Type = AccountType.Current,
+    Balance = 500,
+    CustomerId = 1,
+    State = true,
+    CreatedAt = DateTime.UtcNow,
+    UpdatedAt = DateTime.UtcNow,
+    Customer = null
+  };
   internal static Account SampleAccountWithCustomer = new()
   {
     Id = 1,
@@ -195,6 +207,7 @@ public static class TestsConfiguration
     serviceCollection.AddScoped<DeleteTransactionRequestCommandHandler>();
 
     serviceCollection.AddScoped<GetTransferByIdRequestHandler>();
+    serviceCollection.AddScoped<AddTransferRequestCommandHandler>();
 
     return serviceCollection;
   }
@@ -222,6 +235,8 @@ public static class TestsConfiguration
 
     mockAccountsRepo.Setup(x => x.Exist(1)).ReturnsAsync(true);
 
+    mockAccountsRepo.Setup(x => x.Exist(2)).ReturnsAsync(true);
+
     return mockAccountsRepo.Object;
   }
 
@@ -246,6 +261,8 @@ public static class TestsConfiguration
     mockTransferRepo.Setup(x => x.Get(1, It.IsAny<bool>(), true, false, false, It.IsAny<bool>())).ReturnsAsync(SampleTransferWithAccountAndCustomer);
     mockTransferRepo.Setup(x => x.Get(1, It.IsAny<bool>(), It.IsAny<bool>(), true, false, It.IsAny<bool>())).ReturnsAsync(SampleTransferWithDestinationAccount);
     mockTransferRepo.Setup(x => x.Get(1, It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), true, It.IsAny<bool>())).ReturnsAsync(SampleTransferWithDestinationAccountAndItsCustomer);
+
+    mockTransferRepo.Setup(x => x.Add(It.IsAny<Transfer>())).Returns(SampleTransfer);
 
     return mockTransferRepo.Object;
   }
