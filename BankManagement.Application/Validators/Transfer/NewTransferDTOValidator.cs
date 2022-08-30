@@ -13,6 +13,10 @@ public class NewTransferDTOValidator : AbstractValidator<NewTransferDTO>
       .WithMessage("{PropertyName} must be greater than {ComparisonValue}");
 
     RuleFor(x => x.DestinationAccountId)
+      .NotEqual((x) => x.AccountId)
+      .WithMessage("Destination account can not be the same");
+
+    RuleFor(x => x.DestinationAccountId)
       .MustAsync((id, _) => unitOfWork.AccountsRepo.Exist(id))
       .WithMessage("{PropertyName} must exist");
   }
