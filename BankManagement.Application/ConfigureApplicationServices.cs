@@ -1,3 +1,5 @@
+using System.Reflection;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BankManagement.Application;
@@ -10,6 +12,8 @@ public static class ConfigureApplicationServices
     services.AddSingleton<IAccountMappingProfile, AccountMappingProfile>();
     services.AddSingleton<ITransactionMappingProfile, TransactionMappingProfile>();
     services.AddSingleton<ITransferMappingProfile, TransferMappingProfile>();
+
+    services.AddMediatR(Assembly.GetExecutingAssembly());
 
     return services;
   }
