@@ -5,7 +5,7 @@ namespace BankManagement.Application;
 public class UpdateTransferRequestCommand : IRequest<ExistentTransferDTO>
 {
   public int TransferId { get; set; }
-  public UpdatingTransferDTO? TransactionInfo { get; set; }
+  public UpdatingTransferDTO? TransferInfo { get; set; }
   public bool RetrieveAccountInfo { get; set; }
   public bool RetrieveCustomerInfo { get; set; }
   public bool RetrieveDestinationAccountInfo { get; set; }
